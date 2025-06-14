@@ -104,6 +104,206 @@
   </style>
 </head>
 <body>
+
+
+<script>
+  const loginDiv = document.getElementById("loginDiv");
+  const signupDiv = document.getElementById("signupDiv");
+  const kdmDiv = document.getElementById("kdmDiv");
+
+  const showSignup = document.getElementById("showSignup");
+  const showLogin = document.getElementById("showLogin");
+
+  const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const loginMsg = document.getElementById("loginMsg");
+  const signupMsg = document.getElementById("signupMsg");
+
+  showSignup.addEventListener("click", () => {
+    loginDiv.style.display = "none";
+    signupDiv.style.display = "block";
+    loginMsg.textContent = "";
+    signupMsg.textContent = "";
+  });
+
+  showLogin.addEventListener("click", () => {
+    signupDiv.style.display = "none";
+    loginDiv.style.display = "block";
+    loginMsg.textContent = "";
+    signupMsg.textContent = "";
+  });
+
+  signupBtn.addEventListener("click", async () => {
+    signupMsg.textContent = "";
+    const username = document.getElementById("signupUsername").value.trim();
+    const password = document.getElementById("signupPassword").value.trim();
+
+    if (!username || !password) {
+      signupMsg.textContent = "يرجى إدخال اسم مستخدم وكلمة مرور";
+      return;
+    }
+
+    try {
+      const res = await fetch("/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        signupMsg.style.color = "lightgreen";
+        signupMsg.textContent = data.message;
+        // العودة لتسجيل الدخول بعد إنشاء الحساب
+        setTimeout(() => {
+          signupDiv.style.display = "none";
+          loginDiv.style.display = "block";
+          signupMsg.style.color = "red";
+          signupMsg.textContent = "";
+        }, 2000);
+      } else {
+        signupMsg.style.color = "red";
+        signupMsg.textContent = data.message || "خطأ في إنشاء الحساب";
+      }
+    } catch (e) {
+      signupMsg.style.color = "red";
+      signupMsg.textContent = "خطأ في الاتصال بالخادم";
+    }
+  });
+
+  loginBtn.addEventListener("click", async () => {
+    loginMsg.textContent = "";
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+
+    if (!username || !password) {
+      loginMsg.textContent = "يرجى إدخال اسم مستخدم وكلمة مرور";
+      return;
+    }
+
+    try {
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // نجاح تسجيل الدخول - إظهار إدارة KDM
+        loginDiv.style.display = "none";
+        signupDiv.style.display = "none";
+        kdmDiv.style.display = "block";
+        loadKDMList();
+      } else {
+        loginMsg.textContent = data.message || "فشل تسجيل الدخول";
+      }
+    } catch (e) {
+      loginMsg.textContent = "خطأ في الاتصال بالخادم";
+    }
+  });
+
+  // إضافة باقي وظائف إدارة KDM (تحميل، إضافة، تعديل، حذف) هنا...
+  async function loadKDMList() {
+    try {
+      const res = await fetch("/get-kdms");
+      if (!res.ok) throw new Error("فشل تحميل البيانات");
+      const kdms = await res.json();
+
+      const tbody = document.querySelector("#kdmTable tbody");
+      tbody.innerHTML = "";
+
+      kdms.forEach(kdm => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${kdm.movieName}</td>
+          <td>${kdm.startDate}</td>
+          <td>${kdm.endDate}</td>
+          <td>
+            <button class="btn-edit" data-id="${kdm.id}">تعديل</button>
+            <button class="btn-delete" data-id="${kdm.id}">حذف</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // ربط أزرار التعديل والحذف
+      document.querySelectorAll(".btn-edit").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          const kdm = kdms.find(k => k.id == id);
+          if (!kdm) return;
+          document.getElementById("kdmId").value = kdm.id;
+          document.getElementById("movieName").value = kdm.movieName;
+          document.getElementById("startDate").value = kdm.startDate;
+          document.getElementById("endDate").value = kdm.endDate;
+          document.getElementById("saveBtn").textContent = "تعديل KDM";
+        });
+      });
+
+      document.querySelectorAll(".btn-delete").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+          if (!confirm("هل تريد حذف هذا الـ KDM؟")) return;
+          const res = await fetch(`/delete-kdm/${id}`, { method: "DELETE" });
+          if (res.ok) loadKDMList();
+          else alert("فشل الحذف");
+        });
+      });
+    } catch {
+      alert("فشل تحميل بيانات KDM");
+    }
+  }
+
+  // نموذج إضافة/تعديل KDM
+  document.getElementById("kdmForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const id = document.getElementById("kdmId").value;
+    const movieName = document.getElementById("movieName").value.trim();
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    if (!movieName || !startDate || !endDate) {
+      alert("يرجى تعبئة جميع الحقول");
+      return;
+    }
+
+    try {
+      if (id) {
+        // تعديل
+        const res = await fetch(`/edit-kdm/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ movieName, startDate, endDate }),
+        });
+        if (res.ok) {
+          alert("تم التعديل");
+          document.getElementById("kdmForm").reset();
+          document.getElementById("saveBtn").textContent = "إضافة KDM";
+          document.getElementById("kdmId").value = "";
+          loadKDMList();
+        } else alert("فشل التعديل");
+      } else {
+        // إضافة
+        const res = await fetch("/add-kdm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ movieName, startDate, endDate }),
+        });
+        if (res.ok) {
+          alert("تمت الإضافة");
+          document.getElementById("kdmForm").reset();
+          loadKDMList();
+        } else alert("فشل الإضافة");
+      }
+    } catch {
+      alert("خطأ في الاتصال بالخادم");
+    }
+  });
+</script>
+
+  
   <div id="container">
 
     <!-- تسجيل الدخول -->
