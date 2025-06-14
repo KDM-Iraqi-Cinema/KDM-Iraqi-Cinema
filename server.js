@@ -73,8 +73,8 @@ app.delete("/delete-kdm/:index", (req, res) => {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "your_email@gmail.com",       // استبدل بريدك
-    pass: "your_app_password",          // استخدم App Password
+    user: "almuhsenalgbwry@gmail.com",       // استبدل بريدك
+    pass: "mwgk socn mpyz zwmo",          // استخدم App Password
   },
 });
 
