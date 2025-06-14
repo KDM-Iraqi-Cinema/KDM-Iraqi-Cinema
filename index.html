@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>نظام إدارة ملفات KDM</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Tahoma, sans-serif;
+      direction: rtl;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #1f1f1f;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      background-color: #2c2c2c;
+      border: none;
+      color: white;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #3a7afe;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 40px;
+      border-collapse: collapse;
+      background-color: #1a1a1a;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #333;
+      text-align: center;
+    }
+
+    th {
+      background-color: #2e2e2e;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>لوحة إدارة ملفات KDM</h1>
+
+  <form id="kdmForm">
+    <label for="movieName">اسم الفيلم:</label>
+    <input type="text" id="movieName" required>
+
+    <label for="startDate">تاريخ بداية KDM:</label>
+    <input type="date" id="startDate" required>
+
+    <label for="endDate">تاريخ نهاية KDM:</label>
+    <input type="date" id="endDate" required>
+
+    <button type="submit">إضافة KDM</button>
+  </form>
+
+  <h2>الملفات المضافة:</h2>
+  <table id="kdmTable">
+    <thead>
+      <tr>
+        <th>اسم الفيلم</th>
+        <th>تاريخ البداية</th>
+        <th>تاريخ النهاية</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById("kdmForm");
+    const tableBody = document.querySelector("#kdmTable tbody");
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const movieName = document.getElementById("movieName").value;
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+
+      const kdm = { movieName, startDate, endDate };
+
+      const response = await fetch("/add-kdm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(kdm)
+      });
+
+      if (response.ok) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${movieName}</td>
+          <td>${startDate}</td>
+          <td>${endDate}</td>
+        `;
+        tableBody.appendChild(row);
+        form.reset();
+      } else {
+        alert("حدث خطأ أثناء الإضافة.");
+      }
+    });
+  </script>
+
+</body>
+</html>
