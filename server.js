@@ -11,56 +11,83 @@ const PORT = 3000;
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
 
-let kdmList = [];
 const dataFile = path.join(__dirname, "data.json");
+let kdmList = [];
 
-try {
-  kdmList = JSON.parse(fs.readFileSync(dataFile, "utf8"));
-} catch (e) {
-  kdmList = [];
+// تحميل البيانات من الملف
+function loadData() {
+  try {
+    kdmList = JSON.parse(fs.readFileSync(dataFile, "utf8"));
+  } catch (e) {
+    kdmList = [];
+  }
 }
 
+// حفظ البيانات إلى الملف
+function saveData() {
+  fs.writeFileSync(dataFile, JSON.stringify(kdmList, null, 2));
+}
+
+// أول تحميل للبيانات
+loadData();
+
+// استرجاع قائمة KDM
+app.get("/get-kdms", (req, res) => {
+  loadData();
+  res.json(kdmList);
+});
+
+// إضافة KDM جديد
 app.post("/add-kdm", (req, res) => {
   const kdm = req.body;
   kdmList.push(kdm);
-  fs.writeFileSync(dataFile, JSON.stringify(kdmList, null, 2));
+  saveData();
   res.status(200).json({ message: "تمت الإضافة" });
 });
 
+// تعديل KDM بناءً على الفهرس
+app.put("/edit-kdm/:index", (req, res) => {
+  const index = parseInt(req.params.index, 10);
+  if (index >= 0 && index < kdmList.length) {
+    kdmList[index] = req.body;
+    saveData();
+    res.status(200).json({ message: "تم التعديل" });
+  } else {
+    res.status(400).json({ message: "فهرس غير صالح" });
+  }
+});
+
+// حذف KDM بناءً على الفهرس
+app.delete("/delete-kdm/:index", (req, res) => {
+  const index = parseInt(req.params.index, 10);
+  if (index >= 0 && index < kdmList.length) {
+    kdmList.splice(index, 1);
+    saveData();
+    res.status(200).json({ message: "تم الحذف" });
+  } else {
+    res.status(400).json({ message: "فهرس غير صالح" });
+  }
+});
+
+// إعداد البريد الإلكتروني (Gmail)
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "your_email@gmail.com",
-    pass: "your_app_password",
+    user: "your_email@gmail.com",       // استبدل بريدك
+    pass: "your_app_password",          // استخدم App Password
   },
 });
 
+// مهمة يومية لفحص KDMs
 cron.schedule("0 8 * * *", () => {
+  loadData();
   const today = new Date();
 
-  kdmList.forEach(kdm => {
+  kdmList.forEach((kdm) => {
     const end = new Date(kdm.endDate);
     const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
 
     if (diff === 7) {
       const mailOptions = {
         from: "your_email@gmail.com",
-        to: "recipient@example.com",
-        subject: `تنبيه KDM: "${kdm.movieName}" ينتهي خلال أسبوع`,
-        text: `⚠️ ينتهي KDM الخاص بفيلم "${kdm.movieName}" في ${kdm.endDate}.`,
-      };
-
-      transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-          console.error("فشل إرسال البريد:", err);
-        } else {
-          console.log("📨 تم إرسال الإشعار:", info.response);
-        }
-      });
-    }
-  });
-});
-
-app.listen(PORT, () => {
-  console.log(`🌐 الخادم يعمل على: http://localhost:${PORT}`);
-});
+        to: "recipient
