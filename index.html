@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>نظام إدارة ملفات KDM</title>
   <style>
     body {
@@ -11,11 +11,9 @@
       direction: rtl;
       padding: 20px;
     }
-
     h1, h2 {
       text-align: center;
     }
-
     form {
       max-width: 600px;
       margin: 0 auto;
@@ -23,12 +21,10 @@
       padding: 20px;
       border-radius: 10px;
     }
-
     label {
       display: block;
       margin-top: 15px;
     }
-
     input {
       width: 100%;
       padding: 10px;
@@ -38,7 +34,6 @@
       color: white;
       border-radius: 5px;
     }
-
     button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -48,22 +43,26 @@
       cursor: pointer;
       border-radius: 5px;
     }
-
     table {
       width: 100%;
       margin-top: 40px;
       border-collapse: collapse;
       background-color: #1a1a1a;
     }
-
     th, td {
       padding: 10px;
       border: 1px solid #333;
       text-align: center;
     }
-
     th {
       background-color: #2e2e2e;
+    }
+    .btn-edit {
+      background-color: #ffc107;
+      margin-right: 5px;
+    }
+    .btn-delete {
+      background-color: #dc3545;
     }
   </style>
 </head>
@@ -72,14 +71,15 @@
   <h1>لوحة إدارة ملفات KDM</h1>
 
   <form id="kdmForm">
+    <input type="hidden" id="kdmIndex" value="-1" />
     <label for="movieName">اسم الفيلم:</label>
-    <input type="text" id="movieName" required>
+    <input type="text" id="movieName" required />
 
     <label for="startDate">تاريخ بداية KDM:</label>
-    <input type="date" id="startDate" required>
+    <input type="date" id="startDate" required />
 
     <label for="endDate">تاريخ نهاية KDM:</label>
-    <input type="date" id="endDate" required>
+    <input type="date" id="endDate" required />
 
     <button type="submit">إضافة KDM</button>
   </form>
@@ -91,6 +91,7 @@
         <th>اسم الفيلم</th>
         <th>تاريخ البداية</th>
         <th>تاريخ النهاية</th>
+        <th>الإجراءات</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -99,35 +100,108 @@
   <script>
     const form = document.getElementById("kdmForm");
     const tableBody = document.querySelector("#kdmTable tbody");
+    const kdmIndexInput = document.getElementById("kdmIndex");
+    const movieNameInput = document.getElementById("movieName");
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+    const submitBtn = form.querySelector("button[type='submit']");
 
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
+    let kdmList = [];
 
-      const movieName = document.getElementById("movieName").value;
-      const startDate = document.getElementById("startDate").value;
-      const endDate = document.getElementById("endDate").value;
+    // تحميل البيانات من الخادم عند بداية الصفحة
+    async function loadKdmList() {
+      try {
+        const res = await fetch("/get-kdms");
+        if (!res.ok) throw new Error("فشل تحميل البيانات");
+        kdmList = await res.json();
+        renderTable();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function renderTable() {
+      tableBody.innerHTML = "";
+      kdmList.forEach((kdm, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${kdm.movieName}</td>
+          <td>${kdm.startDate}</td>
+          <td>${kdm.endDate}</td>
+          <td>
+            <button class="btn-edit" data-index="${index}">تعديل</button>
+            <button class="btn-delete" data-index="${index}">حذف</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // إضافة أو تعديل KDM
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const movieName = movieNameInput.value.trim();
+      const startDate = startDateInput.value;
+      const endDate = endDateInput.value;
+      const index = parseInt(kdmIndexInput.value, 10);
 
       const kdm = { movieName, startDate, endDate };
 
-      const response = await fetch("/add-kdm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(kdm)
-      });
+      try {
+        let url = "/add-kdm";
+        let method = "POST";
 
-      if (response.ok) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${movieName}</td>
-          <td>${startDate}</td>
-          <td>${endDate}</td>
-        `;
-        tableBody.appendChild(row);
+        if (index >= 0) {
+          url = `/edit-kdm/${index}`;
+          method = "PUT";
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(kdm),
+        });
+
+        if (!res.ok) throw new Error("حدث خطأ أثناء الحفظ");
+
+        // تحديث القائمة محليًا وإعادة تحميلها من الخادم
+        await loadKdmList();
+
         form.reset();
-      } else {
-        alert("حدث خطأ أثناء الإضافة.");
+        kdmIndexInput.value = -1;
+        submitBtn.textContent = "إضافة KDM";
+      } catch (err) {
+        alert(err.message);
       }
     });
+
+    // التعامل مع أزرار التعديل والحذف
+    tableBody.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("btn-edit")) {
+        const index = e.target.dataset.index;
+        const kdm = kdmList[index];
+        movieNameInput.value = kdm.movieName;
+        startDateInput.value = kdm.startDate;
+        endDateInput.value = kdm.endDate;
+        kdmIndexInput.value = index;
+        submitBtn.textContent = "تحديث KDM";
+      } else if (e.target.classList.contains("btn-delete")) {
+        if (!confirm("هل أنت متأكد من حذف هذا الملف؟")) return;
+        const index = e.target.dataset.index;
+
+        try {
+          const res = await fetch(`/delete-kdm/${index}`, { method: "DELETE" });
+          if (!res.ok) throw new Error("حدث خطأ أثناء الحذف");
+          await loadKdmList();
+        } catch (err) {
+          alert(err.message);
+        }
+      }
+    });
+
+    // تحميل البيانات عند بداية الصفحة
+    loadKdmList();
   </script>
 
 </body>
