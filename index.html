@@ -3,108 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>إدارة KDM - تسجيل الدخول</title>
+  <title>إدارة KDM - السينما الرقمية</title>
   <style>
     body {
-      background: #121212;
+      background-color: #121212;
       color: #eee;
       font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
+      margin: 0;
+      padding: 0 20px 40px;
     }
-    #container {
-      background: #222;
-      padding: 20px;
-      margin-top: 30px;
-      border-radius: 8px;
-      width: 360px;
-      box-shadow: 0 0 10px #000;
-    }
-    h2 {
-      margin-top: 0;
+    h1 {
       text-align: center;
+      margin: 20px 0;
     }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: none;
+    .hidden {
+      display: none;
+    }
+    input, button, select {
+      font-size: 1rem;
+      padding: 6px 10px;
+      margin: 5px 0;
       border-radius: 4px;
-      font-size: 16px;
+      border: none;
     }
-    input {
-      background: #333;
-      color: #eee;
+    input, select {
+      width: 100%;
+      box-sizing: border-box;
     }
     button {
-      background: #0b84ff;
-      color: white;
+      background-color: #bb86fc;
+      color: #121212;
       cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
     }
     button:hover {
-      background: #005ecb;
+      background-color: #9a64d8;
     }
-    .link {
-      color: #0b84ff;
-      text-align: center;
-      cursor: pointer;
-      margin-top: 10px;
-      user-select: none;
+    .form-container {
+      max-width: 400px;
+      margin: 10px auto 30px;
+      padding: 20px;
+      background-color: #1f1f1f;
+      border-radius: 8px;
     }
-    .error {
-      color: #ff4444;
-      text-align: center;
-      margin-top: 10px;
-    }
-    .success {
-      color: #44ff44;
-      text-align: center;
-      margin-top: 10px;
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      margin-top: 10px;
+      background-color: #222;
     }
     th, td {
       border: 1px solid #444;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
     }
     th {
-      background: #333;
+      background-color: #333;
     }
-    .btn-edit, .btn-delete {
-      background: #0b84ff;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      margin: 2px;
+    button.btn-edit {
+      background-color: #03dac5;
+      color: #000;
+      margin-right: 6px;
+    }
+    button.btn-delete {
+      background-color: #cf6679;
+      color: #000;
+    }
+    #loginMsg, #signupMsg {
+      color: #cf6679;
+      margin-top: 10px;
+      min-height: 20px;
+      text-align: center;
+    }
+    .switch-link {
+      text-align: center;
+      margin-top: 10px;
       cursor: pointer;
-      border-radius: 4px;
-    }
-    .btn-delete {
-      background: #d11a2a;
-    }
-    #logoutBtn {
-      margin-top: 10px;
-      background: #d11a2a;
-    }
-    #kdmForm input {
-      margin-bottom: 10px;
-    }
-    #kdmForm label {
-      display: block;
-      margin-top: 10px;
-      margin-bottom: 5px;
+      color: #bb86fc;
+      user-select: none;
     }
   </style>
 </head>
 <body>
+  <h1>إدارة KDM - السينما الرقمية</h1>
 
+  <!-- تسجيل الدخول -->
+  <div id="loginDiv" class="form-container">
+    <h2>تسجيل الدخول</h2>
+    <label for="loginUsername">اسم المستخدم:</label>
+    <input type="text" id="loginUsername" autocomplete="username" />
+    <label for="loginPassword">كلمة المرور:</label>
+    <input type="password" id="loginPassword" autocomplete="current-password" />
+    <button id="loginBtn">تسجيل الدخول</button>
+    <div id="loginMsg"></div>
+    <div class="switch-link" id="showSignup">ليس لديك حساب؟ إنشاء حساب جديد</div>
+  </div>
+
+  <!-- إنشاء حساب -->
+  <div id="signupDiv" class="form-container hidden">
+    <h2>إنشاء حساب جديد</h2>
+    <label for="signupUsername">اسم المستخدم:</label>
+    <input type="text" id="signupUsername" autocomplete="username" />
+    <label for="signupPassword">كلمة المرور:</label>
+    <input type="password" id="signupPassword" autocomplete="new-password" />
+    <button id="signupBtn">إنشاء حساب</button>
+    <div id="signupMsg"></div>
+    <div class="switch-link" id="showLogin">لديك حساب؟ تسجيل الدخول</div>
+  </div>
+
+  <!-- إدارة KDM -->
+  <div id="kdmDiv" class="hidden">
+    <button id="logoutBtn" style="float: left; margin-bottom: 10px;">تسجيل الخروج</button>
+    <h2>إدارة KDM</h2>
+
+    <form id="kdmForm" style="max-width: 500px; margin: auto;">
+      <input type="hidden" id="kdmId" />
+      <label for="movieName">اسم الفيلم:</label>
+      <input type="text" id="movieName" required />
+      <label for="startDate">تاريخ بداية KDM:</label>
+      <input type="date" id="startDate" required />
+      <label for="endDate">تاريخ نهاية KDM:</label>
+      <input type="date" id="endDate" required />
+      <button type="submit" id="saveBtn">إضافة KDM</button>
+    </form>
+
+    <table id="kdmTable">
+      <thead>
+        <tr>
+          <th>اسم الفيلم</th>
+          <th>بداية KDM</th>
+          <th>نهاية KDM</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- البيانات ستظهر هنا -->
+      </tbody>
+    </table>
+  </div>
 
 <script>
   const loginDiv = document.getElementById("loginDiv");
@@ -155,19 +197,18 @@
       if (res.ok) {
         signupMsg.style.color = "lightgreen";
         signupMsg.textContent = data.message;
-        // العودة لتسجيل الدخول بعد إنشاء الحساب
         setTimeout(() => {
           signupDiv.style.display = "none";
           loginDiv.style.display = "block";
-          signupMsg.style.color = "red";
+          signupMsg.style.color = "#cf6679";
           signupMsg.textContent = "";
         }, 2000);
       } else {
-        signupMsg.style.color = "red";
+        signupMsg.style.color = "#cf6679";
         signupMsg.textContent = data.message || "خطأ في إنشاء الحساب";
       }
     } catch (e) {
-      signupMsg.style.color = "red";
+      signupMsg.style.color = "#cf6679";
       signupMsg.textContent = "خطأ في الاتصال بالخادم";
     }
   });
@@ -190,7 +231,6 @@
       });
       const data = await res.json();
       if (res.ok) {
-        // نجاح تسجيل الدخول - إظهار إدارة KDM
         loginDiv.style.display = "none";
         signupDiv.style.display = "none";
         kdmDiv.style.display = "block";
@@ -203,7 +243,13 @@
     }
   });
 
-  // إضافة باقي وظائف إدارة KDM (تحميل، إضافة، تعديل، حذف) هنا...
+  logoutBtn.addEventListener("click", () => {
+    kdmDiv.style.display = "none";
+    loginDiv.style.display = "block";
+    document.getElementById("loginUsername").value = "";
+    document.getElementById("loginPassword").value = "";
+  });
+
   async function loadKDMList() {
     try {
       const res = await fetch("/get-kdms");
@@ -227,7 +273,6 @@
         tbody.appendChild(tr);
       });
 
-      // ربط أزرار التعديل والحذف
       document.querySelectorAll(".btn-edit").forEach(btn => {
         btn.addEventListener("click", () => {
           const id = btn.dataset.id;
@@ -255,7 +300,6 @@
     }
   }
 
-  // نموذج إضافة/تعديل KDM
   document.getElementById("kdmForm").addEventListener("submit", async e => {
     e.preventDefault();
 
@@ -271,7 +315,6 @@
 
     try {
       if (id) {
-        // تعديل
         const res = await fetch(`/edit-kdm/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -285,7 +328,6 @@
           loadKDMList();
         } else alert("فشل التعديل");
       } else {
-        // إضافة
         const res = await fetch("/add-kdm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -302,44 +344,5 @@
     }
   });
 </script>
-
-  
-  <div id="container">
-
-    <!-- تسجيل الدخول -->
-    <div id="loginDiv">
-      <h2>تسجيل الدخول</h2>
-      <input id="loginUsername" type="text" placeholder="اسم المستخدم" />
-      <input id="loginPassword" type="password" placeholder="كلمة المرور" />
-      <button id="loginBtn">دخول</button>
-      <div class="link" id="showSignup">إنشاء حساب جديد</div>
-      <div id="loginMsg" class="error"></div>
-    </div>
-
-    <!-- إنشاء حساب -->
-    <div id="signupDiv" style="display:none;">
-      <h2>إنشاء حساب جديد</h2>
-      <input id="signupUsername" type="text" placeholder="اسم المستخدم" />
-      <input id="signupPassword" type="password" placeholder="كلمة المرور" />
-      <button id="signupBtn">إنشاء</button>
-      <div class="link" id="showLogin">العودة لتسجيل الدخول</div>
-      <div id="signupMsg" class="error"></div>
-    </div>
-
-    <!-- إدارة KDM -->
-    <div id="kdmDiv" style="display:none;">
-      <h2>إدارة KDM</h2>
-
-      <form id="kdmForm">
-        <input type="hidden" id="kdmId" />
-        <label>اسم الفيلم:</label>
-        <input type="text" id="movieName" required />
-        <label>تاريخ البداية:</label>
-        <input type="date" id="startDate" required />
-        <label>تاريخ النهاية:</label>
-        <input type="date" id="endDate" required />
-        <button type="submit" id="saveBtn">إضافة KDM</button>
-      </form>
-
-      <table>
-        <thead>
+</body>
+</html>
