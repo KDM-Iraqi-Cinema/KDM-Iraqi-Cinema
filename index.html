@@ -1,208 +1,145 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>نظام إدارة ملفات KDM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إدارة KDM - تسجيل الدخول</title>
   <style>
     body {
-      background-color: #121212;
-      color: white;
-      font-family: Tahoma, sans-serif;
-      direction: rtl;
-      padding: 20px;
+      background: #121212;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
-    h1, h2 {
+    #container {
+      background: #222;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 8px;
+      width: 360px;
+      box-shadow: 0 0 10px #000;
+    }
+    h2 {
+      margin-top: 0;
       text-align: center;
     }
-    form {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #1f1f1f;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-    }
-    input {
+    input, button {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
-      background-color: #2c2c2c;
+      margin: 8px 0;
       border: none;
-      color: white;
-      border-radius: 5px;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    input {
+      background: #333;
+      color: #eee;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #3a7afe;
+      background: #0b84ff;
       color: white;
-      border: none;
       cursor: pointer;
-      border-radius: 5px;
+    }
+    button:hover {
+      background: #005ecb;
+    }
+    .link {
+      color: #0b84ff;
+      text-align: center;
+      cursor: pointer;
+      margin-top: 10px;
+      user-select: none;
+    }
+    .error {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .success {
+      color: #44ff44;
+      text-align: center;
+      margin-top: 10px;
     }
     table {
       width: 100%;
-      margin-top: 40px;
       border-collapse: collapse;
-      background-color: #1a1a1a;
+      margin-top: 15px;
     }
     th, td {
-      padding: 10px;
-      border: 1px solid #333;
+      border: 1px solid #444;
+      padding: 8px;
       text-align: center;
     }
     th {
-      background-color: #2e2e2e;
+      background: #333;
     }
-    .btn-edit {
-      background-color: #ffc107;
-      margin-right: 5px;
+    .btn-edit, .btn-delete {
+      background: #0b84ff;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      margin: 2px;
+      cursor: pointer;
+      border-radius: 4px;
     }
     .btn-delete {
-      background-color: #dc3545;
+      background: #d11a2a;
+    }
+    #logoutBtn {
+      margin-top: 10px;
+      background: #d11a2a;
+    }
+    #kdmForm input {
+      margin-bottom: 10px;
+    }
+    #kdmForm label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
+  <div id="container">
 
-  <h1>لوحة إدارة ملفات KDM</h1>
+    <!-- تسجيل الدخول -->
+    <div id="loginDiv">
+      <h2>تسجيل الدخول</h2>
+      <input id="loginUsername" type="text" placeholder="اسم المستخدم" />
+      <input id="loginPassword" type="password" placeholder="كلمة المرور" />
+      <button id="loginBtn">دخول</button>
+      <div class="link" id="showSignup">إنشاء حساب جديد</div>
+      <div id="loginMsg" class="error"></div>
+    </div>
 
-  <form id="kdmForm">
-    <input type="hidden" id="kdmIndex" value="-1" />
-    <label for="movieName">اسم الفيلم:</label>
-    <input type="text" id="movieName" required />
+    <!-- إنشاء حساب -->
+    <div id="signupDiv" style="display:none;">
+      <h2>إنشاء حساب جديد</h2>
+      <input id="signupUsername" type="text" placeholder="اسم المستخدم" />
+      <input id="signupPassword" type="password" placeholder="كلمة المرور" />
+      <button id="signupBtn">إنشاء</button>
+      <div class="link" id="showLogin">العودة لتسجيل الدخول</div>
+      <div id="signupMsg" class="error"></div>
+    </div>
 
-    <label for="startDate">تاريخ بداية KDM:</label>
-    <input type="date" id="startDate" required />
+    <!-- إدارة KDM -->
+    <div id="kdmDiv" style="display:none;">
+      <h2>إدارة KDM</h2>
 
-    <label for="endDate">تاريخ نهاية KDM:</label>
-    <input type="date" id="endDate" required />
+      <form id="kdmForm">
+        <input type="hidden" id="kdmId" />
+        <label>اسم الفيلم:</label>
+        <input type="text" id="movieName" required />
+        <label>تاريخ البداية:</label>
+        <input type="date" id="startDate" required />
+        <label>تاريخ النهاية:</label>
+        <input type="date" id="endDate" required />
+        <button type="submit" id="saveBtn">إضافة KDM</button>
+      </form>
 
-    <button type="submit">إضافة KDM</button>
-  </form>
-
-  <h2>الملفات المضافة:</h2>
-  <table id="kdmTable">
-    <thead>
-      <tr>
-        <th>اسم الفيلم</th>
-        <th>تاريخ البداية</th>
-        <th>تاريخ النهاية</th>
-        <th>الإجراءات</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
-    const form = document.getElementById("kdmForm");
-    const tableBody = document.querySelector("#kdmTable tbody");
-    const kdmIndexInput = document.getElementById("kdmIndex");
-    const movieNameInput = document.getElementById("movieName");
-    const startDateInput = document.getElementById("startDate");
-    const endDateInput = document.getElementById("endDate");
-    const submitBtn = form.querySelector("button[type='submit']");
-
-    let kdmList = [];
-
-    // تحميل البيانات من الخادم عند بداية الصفحة
-    async function loadKdmList() {
-      try {
-        const res = await fetch("/get-kdms");
-        if (!res.ok) throw new Error("فشل تحميل البيانات");
-        kdmList = await res.json();
-        renderTable();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    function renderTable() {
-      tableBody.innerHTML = "";
-      kdmList.forEach((kdm, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${kdm.movieName}</td>
-          <td>${kdm.startDate}</td>
-          <td>${kdm.endDate}</td>
-          <td>
-            <button class="btn-edit" data-index="${index}">تعديل</button>
-            <button class="btn-delete" data-index="${index}">حذف</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    // إضافة أو تعديل KDM
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const movieName = movieNameInput.value.trim();
-      const startDate = startDateInput.value;
-      const endDate = endDateInput.value;
-      const index = parseInt(kdmIndexInput.value, 10);
-
-      const kdm = { movieName, startDate, endDate };
-
-      try {
-        let url = "/add-kdm";
-        let method = "POST";
-
-        if (index >= 0) {
-          url = `/edit-kdm/${index}`;
-          method = "PUT";
-        }
-
-        const res = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(kdm),
-        });
-
-        if (!res.ok) throw new Error("حدث خطأ أثناء الحفظ");
-
-        // تحديث القائمة محليًا وإعادة تحميلها من الخادم
-        await loadKdmList();
-
-        form.reset();
-        kdmIndexInput.value = -1;
-        submitBtn.textContent = "إضافة KDM";
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-
-    // التعامل مع أزرار التعديل والحذف
-    tableBody.addEventListener("click", async (e) => {
-      if (e.target.classList.contains("btn-edit")) {
-        const index = e.target.dataset.index;
-        const kdm = kdmList[index];
-        movieNameInput.value = kdm.movieName;
-        startDateInput.value = kdm.startDate;
-        endDateInput.value = kdm.endDate;
-        kdmIndexInput.value = index;
-        submitBtn.textContent = "تحديث KDM";
-      } else if (e.target.classList.contains("btn-delete")) {
-        if (!confirm("هل أنت متأكد من حذف هذا الملف؟")) return;
-        const index = e.target.dataset.index;
-
-        try {
-          const res = await fetch(`/delete-kdm/${index}`, { method: "DELETE" });
-          if (!res.ok) throw new Error("حدث خطأ أثناء الحذف");
-          await loadKdmList();
-        } catch (err) {
-          alert(err.message);
-        }
-      }
-    });
-
-    // تحميل البيانات عند بداية الصفحة
-    loadKdmList();
-  </script>
-
-</body>
-</html>
+      <table>
+        <thead>
