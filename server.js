@@ -1,54 +1,61 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
-const port = process.env.PORT || 3000;
-
 app.use(cors());
 app.use(express.json());
 
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+// 🟢 قاعدة البيانات
+mongoose.connect("mongodb+srv://<username>:<password>@cluster0.abkeh.mongodb.net/kdmDB?retryWrites=true&w=majority")
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
+// 🟢 نموذج KDM
 const kdmSchema = new mongoose.Schema({
   movieName: String,
   startTime: String,
   endTime: String
 });
-
 const KDM = mongoose.model("KDM", kdmSchema);
 
-// Get all KDMs
+// 🟢 API لجلب جميع KDM
 app.get("/kdms", async (req, res) => {
   const kdms = await KDM.find();
   res.json(kdms);
 });
 
-// Add new KDM
+// 🟢 API لإضافة KDM
 app.post("/kdms", async (req, res) => {
-  const newKdm = new KDM(req.body);
-  await newKdm.save();
-  res.json({ message: "تمت الإضافة بنجاح" });
+  const kdm = new KDM(req.body);
+  await kdm.save();
+  res.status(201).json(kdm);
 });
 
-// Update KDM
-app.put("/kdms/:id", async (req, res) => {
-  await KDM.findByIdAndUpdate(req.params.id, req.body);
-  res.json({ message: "تم التحديث" });
-});
-
-// Delete KDM
+// 🟢 API لحذف KDM
 app.delete("/kdms/:id", async (req, res) => {
   await KDM.findByIdAndDelete(req.params.id);
-  res.json({ message: "تم الحذف" });
+  res.status(204).send();
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
+// 🟢 API لتعديل KDM
+app.put("/kdms/:id", async (req, res) => {
+  const updated = await KDM.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(updated);
+});
+
+// 🟢 إرسال ملف index.html مباشرة من الجذر
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// 🟢 إرسال ملفات CSS أو JS من الجذر
+app.use(express.static(__dirname));
+
+// 🟢 بدء السيرفر
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
 });
