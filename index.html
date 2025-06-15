@@ -211,48 +211,19 @@
     user-select: none;
   }
 
-  @media (max-width: 600px) {
-    body {
-      padding: 15px 8px;
-    }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 30px;
-    }
-
-    form {
-      padding: 20px 15px;
-    }
-
-    label {
-      font-size: 1rem;
-    }
-
-    input[type="text"],
-    input[type="datetime-local"],
-    #searchInput {
-      font-size: 0.9rem;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-    }
-
-    button {
-      font-size: 1rem;
-      padding: 12px 0;
-    }
-
-    table.kdm-list thead th,
-    table.kdm-list tbody tr.kdm-row td {
-      font-size: 0.9rem;
-      padding: 10px 12px;
-    }
-
-    .action-btn {
-      font-size: 0.9rem;
-      padding: 7px 14px;
-    }
+@media (max-width: 600px) {
+  table.kdm-list tbody tr.kdm-row td {
+    padding: 8px 10px;  /* تقليل المسافات الأفقية والعمودية */
+    white-space: normal; /* السماح بلف النص عند الضرورة */
   }
+
+  /* تقليل عرض الأعمدة إذا كان ممكن */
+  table.kdm-list thead th, 
+  table.kdm-list tbody tr.kdm-row td {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
+}
 </style>
 </head>
 <body>
