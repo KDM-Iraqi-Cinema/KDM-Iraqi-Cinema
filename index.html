@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>إدارة KDM - السينما العراقية</title>
+  <title>إدارة مفاتيح KDM - السينما العراقية</title>
   <style>
     body {
       background-color: #121212;
@@ -68,11 +68,18 @@
 
     .kdm-actions {
       margin-top: 10px;
+      display: flex;
+      gap: 10px;
     }
 
     .error {
       color: red;
       margin-top: 15px;
+    }
+
+    .kdm-actions button {
+      flex: 1;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -81,9 +88,9 @@
 <h1>نظام إدارة مفاتيح KDM</h1>
 
 <form id="kdmForm">
-  <input type="text" id="movieName" placeholder="اسم الفيلم" required />
-  <input type="datetime-local" id="startTime" placeholder="تاريخ ووقت البدء" required />
-  <input type="datetime-local" id="endTime" placeholder="تاريخ ووقت الانتهاء" required />
+  <input type="text" id="movieName" placeholder="📽️ اسم الفيلم" required />
+  <input type="datetime-local" id="startTime" placeholder="⏱️ وقت البدء" required />
+  <input type="datetime-local" id="endTime" placeholder="🛑 وقت الانتهاء" required />
   <button type="submit">➕ إضافة المفتاح</button>
 </form>
 
@@ -94,10 +101,8 @@
   const kdmForm = document.getElementById('kdmForm');
   const kdmList = document.getElementById('kdmList');
 
-  // تحميل البيانات عند التشغيل
   fetchKDMs();
 
-  // إضافة KDM جديد
   kdmForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const movieName = document.getElementById('movieName').value.trim();
@@ -118,15 +123,13 @@
 
       if (!res.ok) throw new Error(`فشل في الإضافة - ${res.statusText}`);
 
-      // إعادة التحميل
       kdmForm.reset();
-      fetchKDMs();
+      fetchKDMs(); // تحديث القائمة مباشرة
     } catch (err) {
       alert(`حدث خطأ أثناء الإضافة: ${err.message}`);
     }
   });
 
-  // تحميل وعرض قائمة المفاتيح
   async function fetchKDMs() {
     try {
       const res = await fetch(apiUrl);
@@ -138,7 +141,6 @@
     }
   }
 
-  // عرض المفاتيح
   function renderKDMs(kdms) {
     kdmList.innerHTML = '';
     if (!Array.isArray(kdms) || kdms.length === 0) {
@@ -155,13 +157,64 @@
 
       div.className = `kdm ${isExpiring ? 'expiring' : ''}`;
       div.innerHTML = `
-        🎬 <strong>${kdm.movieName}</strong><br/>
+        <strong>🎬 ${kdm.movieName}</strong><br/>
         ⏱️ من: ${new Date(kdm.startTime).toLocaleString()}<br/>
         🛑 إلى: ${new Date(kdm.endTime).toLocaleString()}
+        <div class="kdm-actions">
+          <button onclick="deleteKDM('${kdm._id}')">🗑️ حذف</button>
+          <button onclick="editKDM('${kdm._id}', '${kdm.movieName}', '${kdm.startTime}', '${kdm.endTime}')">✏️ تعديل</button>
+        </div>
       `;
       kdmList.appendChild(div);
     });
   }
+
+  async function deleteKDM(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا المفتاح؟')) return;
+    try {
+      const res = await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`فشل الحذف - ${res.statusText}`);
+      fetchKDMs();
+    } catch (err) {
+      alert(`حدث خطأ أثناء الحذف: ${err.message}`);
+    }
+  }
+
+  function editKDM(id, movieName, startTime, endTime) {
+    document.getElementById('movieName').value = movieName;
+    document.getElementById('startTime').value = startTime;
+    document.getElementById('endTime').value = endTime;
+
+    const button = kdmForm.querySelector('button');
+    button.textContent = '💾 حفظ التعديل';
+    kdmForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const updatedName = document.getElementById('movieName').value.trim();
+      const updatedStart = document.getElementById('startTime').value;
+      const updatedEnd = document.getElementById('endTime').value;
+
+      try {
+        const res = await fetch(`${apiUrl}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            movieName: updatedName,
+            startTime: updatedStart,
+            endTime: updatedEnd
+          }),
+        });
+        if (!res.ok) throw new Error(`فشل التحديث - ${res.statusText}`);
+        kdmForm.reset();
+        button.textContent = '➕ إضافة المفتاح';
+        kdmForm.onsubmit = defaultSubmitHandler;
+        fetchKDMs();
+      } catch (err) {
+        alert(`خطأ أثناء التحديث: ${err.message}`);
+      }
+    };
+  }
+
+  const defaultSubmitHandler = kdmForm.onsubmit;
 </script>
 
 </body>
