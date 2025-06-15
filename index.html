@@ -1,181 +1,280 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>إدارة مفاتيح KDM - السينما الرقمية</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>إدارة مفاتيح KDM - السينما الرقمية</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
 
+  body {
+    background: linear-gradient(135deg, #2a014c, #3b0f71);
+    color: #e0d9f0;
+    font-family: 'Cairo', sans-serif;
+    margin: 0;
+    padding: 25px 15px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #d2b9ff;
+    font-weight: 900;
+    font-size: 2.8rem;
+    margin-bottom: 40px;
+    user-select: none;
+    text-shadow: 0 0 8px #a077ffaa;
+  }
+
+  form {
+    max-width: 500px;
+    margin: 0 auto 40px;
+    background-color: #3a2161dd;
+    border-radius: 12px;
+    padding: 25px 30px;
+    box-shadow: 0 0 15px #6b4bff77;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #cbbcff;
+    font-size: 1.1rem;
+  }
+
+  input[type="text"],
+  input[type="datetime-local"] {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    border: none;
+    border-radius: 8px;
+    background-color: #5c4299cc;
+    color: #f3ecff;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+
+  input[type="text"]::placeholder,
+  input[type="datetime-local"]::placeholder {
+    color: #bba6ffcc;
+  }
+
+  input[type="text"]:focus,
+  input[type="datetime-local"]:focus {
+    outline: none;
+    background-color: #6c55b3ee;
+    box-shadow: 0 0 10px #b8a3ffcc;
+  }
+
+  .desc-text {
+    color: #b9a9ffcc;
+    font-size: 0.95rem;
+    margin-top: -12px;
+    margin-bottom: 14px;
+    user-select: none;
+  }
+
+  button {
+    width: 100%;
+    background: linear-gradient(90deg, #7e57c2, #512da8);
+    color: #f4f1ff;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 0;
+    font-size: 1.15rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px #673ab733;
+    transition: background 0.4s ease;
+    user-select: none;
+  }
+
+  button:hover {
+    background: linear-gradient(90deg, #9f7de8, #6844c6);
+  }
+
+  #searchInput {
+    max-width: 500px;
+    margin: 0 auto 30px;
+    display: block;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: #5c4299cc;
+    color: #f3ecff;
+    font-size: 1rem;
+    box-sizing: border-box;
+    user-select: text;
+  }
+
+  table.kdm-list {
+    width: 95%;
+    max-width: 900px;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+    table-layout: fixed;
+  }
+
+  table.kdm-list thead th {
+    background-color: #5e3da3;
+    color: #ddd7ff;
+    font-weight: 800;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    border-radius: 10px 10px 0 0;
+    user-select: none;
+  }
+
+  /* زيادة المسافات بين الأعمدة */
+  table.kdm-list thead th:nth-child(1),
+  table.kdm-list tbody td:nth-child(1) {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+  table.kdm-list thead th:nth-child(2),
+  table.kdm-list tbody td:nth-child(2),
+  table.kdm-list thead th:nth-child(3),
+  table.kdm-list tbody td:nth-child(3) {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  table.kdm-list thead th:nth-child(4),
+  table.kdm-list tbody td:nth-child(4) {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  table.kdm-list tbody tr.kdm-row {
+    background: linear-gradient(90deg, #3c2671, #4a3389);
+    box-shadow: 0 5px 15px #6a4fcfcc;
+    color: #e0d9f0;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    border-radius: 12px;
+    word-wrap: break-word;
+  }
+
+  table.kdm-list tbody tr.kdm-row td {
+    padding: 15px 18px;
+    text-align: center;
+    vertical-align: middle;
+    user-select: text;
+  }
+
+  /* لون أحمر كامل قبل 5 أيام من الانتهاء */
+  table.kdm-list tbody tr.kdm-row.ending-soon {
+    background: #a43535 !important;
+    box-shadow: 0 5px 15px #b94444cc !important;
+    color: #fff !important;
+  }
+
+  .action-btn {
+    margin: 0 6px;
+    padding: 8px 18px;
+    font-weight: 700;
+    border-radius: 9px;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    font-size: 1rem;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+
+  .edit-btn {
+    background: linear-gradient(90deg, #9173d7, #6e49b7);
+    color: #f1eaff;
+    box-shadow: 0 3px 8px #7d64d9cc;
+  }
+  .edit-btn:hover {
+    background: linear-gradient(90deg, #b19af5, #8a6de3);
+    box-shadow: 0 5px 15px #9f89ecbb;
+  }
+
+  .delete-btn {
+    background: linear-gradient(90deg, #d1436f, #9e2145);
+    color: #ffe7e7;
+    box-shadow: 0 3px 8px #c6547fbb;
+  }
+  .delete-btn:hover {
+    background: linear-gradient(90deg, #e5749c, #b73769);
+    box-shadow: 0 5px 15px #e0709dbc;
+  }
+
+  .empty-msg {
+    text-align: center;
+    font-size: 1rem;
+    color: #b9a9ffcc;
+    padding: 30px 0;
+    user-select: none;
+  }
+
+  @media (max-width: 600px) {
     body {
-      background: #1e1e2f;
-      color: #e2e2e2;
-      font-family: 'Cairo', sans-serif;
-      padding: 25px 15px;
+      padding: 15px 8px;
     }
 
     h1 {
-      text-align: center;
-      font-size: 2.5rem;
-      color: #ffd700;
-      font-weight: 900;
+      font-size: 2rem;
       margin-bottom: 30px;
     }
 
-    .desc-text {
-      font-size: 1rem;
-      color: #ccc;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-
     form {
-      background: #2c2c3f;
-      padding: 25px;
-      max-width: 500px;
-      margin: auto;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #444;
+      padding: 20px 15px;
     }
 
     label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
-
-    input[type="text"],
-    input[type="datetime-local"] {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: none;
-      border-radius: 8px;
-      background: #3b3b4f;
-      color: #fff;
-    }
-
-    input::placeholder {
-      color: #aaa;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      background: linear-gradient(90deg, #d4af37, #a17f1c);
-      color: #000;
-      font-weight: bold;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: linear-gradient(90deg, #ffce54, #b5911c);
-    }
-
-    #searchInput {
-      display: block;
-      margin: 30px auto 40px;
-      padding: 12px 16px;
-      width: 90%;
-      max-width: 500px;
-      border: none;
-      border-radius: 10px;
-      background-color: #2b2b3d;
-      color: #fff;
       font-size: 1rem;
     }
 
-    .search-label {
-      text-align: center;
-      margin-bottom: 10px;
-      font-weight: bold;
-      color: #ccc;
+    input[type="text"],
+    input[type="datetime-local"],
+    #searchInput {
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      margin-bottom: 14px;
     }
 
-    table {
-      width: 95%;
-      max-width: 1000px;
-      margin: auto;
-      border-spacing: 0 10px;
+    button {
+      font-size: 1rem;
+      padding: 12px 0;
     }
 
-    thead th {
-      background: #333850;
-      padding: 15px;
-      color: #f0f0f0;
-      border-radius: 8px 8px 0 0;
-    }
-
-    .kdm-row {
-      background: #2d2d3c;
-      color: #fff;
-      font-weight: 600;
-      text-align: center;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .kdm-row td {
-      padding: 14px;
-      direction: ltr;
-      unicode-bidi: plaintext;
-    }
-
-    .ending-soon {
-      background: #a43535 !important;
-      color: #fff !important;
+    table.kdm-list thead th,
+    table.kdm-list tbody tr.kdm-row td {
+      font-size: 0.9rem;
+      padding: 10px 12px;
     }
 
     .action-btn {
-      margin: 0 5px;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 7px 14px;
     }
-
-    .edit-btn {
-      background: #d4af37;
-      color: #000;
-    }
-
-    .delete-btn {
-      background: #d1436f;
-      color: #fff;
-    }
-
-    .empty-msg {
-      text-align: center;
-      padding: 20px;
-      color: #888;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
 <h1>إدارة مفاتيح KDM - السينما الرقمية</h1>
-
-<div class="search-label">🔍 ابحث عن مفاتيح KDM حسب اسم الفيلم مباشرة أثناء الكتابة</div>
-<input type="text" id="searchInput" placeholder="ابحث باسم الفيلم..." onkeyup="filterKDMs()" />
 
 <form id="kdmForm">
   <label for="movieName">اسم الفيلم:</label>
   <input type="text" id="movieName" placeholder="أدخل اسم الفيلم" required />
 
   <div class="desc-text">اختر تاريخ ووقت بدء صلاحية المفتاح (KDM):</div>
-  <input type="datetime-local" id="startTime" required />
+  <input type="datetime-local" id="startTime" required placeholder="تاريخ ووقت البداية" />
 
   <div class="desc-text">اختر تاريخ ووقت نهاية صلاحية المفتاح (KDM):</div>
-  <input type="datetime-local" id="endTime" required />
+  <input type="datetime-local" id="endTime" required placeholder="تاريخ ووقت الانتهاء" />
 
   <button type="submit">➕ إضافة المفتاح</button>
 </form>
 
-<table>
+<input type="text" id="searchInput" placeholder="🔍 ابحث باسم الفيلم..." aria-label="بحث باسم الفيلم" />
+
+<table class="kdm-list" id="kdmTable" aria-label="قائمة مفاتيح KDM">
   <thead>
     <tr>
       <th>اسم الفيلم</th>
@@ -185,51 +284,84 @@
     </tr>
   </thead>
   <tbody id="kdmBody">
-    <!-- المحتوى يُحقن هنا -->
+    <!-- مفاتيح KDM ستضاف هنا -->
   </tbody>
 </table>
 
 <script>
   const apiUrl = 'https://kdm-iraqi-cinema.onrender.com/kdms';
+
   const kdmForm = document.getElementById('kdmForm');
   const kdmBody = document.getElementById('kdmBody');
+  const searchInput = document.getElementById('searchInput');
 
+  let isEditing = false;
+  let editingId = null;
+  let kdmsData = [];
+
+  // تحميل المفاتيح من السيرفر وعرضها
   async function loadKDMs() {
-    kdmBody.innerHTML = '';
     try {
       const res = await fetch(apiUrl);
-      const kdms = await res.json();
-
-      if (kdms.length === 0) {
-        kdmBody.innerHTML = `<tr><td colspan="4" class="empty-msg">لا توجد مفاتيح KDM مسجلة</td></tr>`;
-        return;
-      }
-
-      const now = new Date();
-      kdms.forEach(({ _id, movieName, startTime, endTime }) => {
-        const start = new Date(startTime);
-        const end = new Date(endTime);
-        const daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
-        const isEndingSoon = daysLeft <= 5 && daysLeft >= 0;
-
-        const tr = document.createElement('tr');
-        tr.className = 'kdm-row' + (isEndingSoon ? ' ending-soon' : '');
-        tr.innerHTML = `
-          <td>${movieName}</td>
-          <td>${start.toLocaleString('en-US')}</td>
-          <td>${end.toLocaleString('en-US')}</td>
-          <td>
-            <button class="action-btn edit-btn" onclick="editKDM('${_id}', \`${movieName}\`, '${startTime}', '${endTime}')">✏️</button>
-            <button class="action-btn delete-btn" onclick="deleteKDM('${_id}')">🗑️</button>
-          </td>
-        `;
-        kdmBody.appendChild(tr);
-      });
-    } catch (err) {
-      alert('فشل في تحميل البيانات');
+      if (!res.ok) throw new Error('فشل في تحميل البيانات.');
+      kdmsData = await res.json();
+      displayKDMs(kdmsData);
+    } catch (error) {
+      alert(error.message);
     }
   }
 
+  // عرض المفاتيح مع دعم البحث
+  function displayKDMs(kdms) {
+    kdmBody.innerHTML = '';
+
+    if (kdms.length === 0) {
+      kdmBody.innerHTML = `<tr><td colspan="4" class="empty-msg">لا توجد مفاتيح KDM مسجلة</td></tr>`;
+      return;
+    }
+
+    const now = new Date();
+    kdms.forEach(({ _id, movieName, startTime, endTime }) => {
+      const start = new Date(startTime);
+      const end = new Date(endTime);
+      const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+      const isEndingSoon = diffDays <= 5 && diffDays >= 0;
+
+      const row = document.createElement('tr');
+      row.className = 'kdm-row' + (isEndingSoon ? ' ending-soon' : '');
+
+      row.innerHTML = `
+        <td>${escapeHTML(movieName)}</td>
+        <td>${start.toLocaleString('en-US', { hour12: false })}</td>
+        <td>${end.toLocaleString('en-US', { hour12: false })}</td>
+        <td>
+          <button class="action-btn edit-btn" onclick="editKDM('${_id}', '${escapeJS(movieName)}', '${startTime}', '${endTime}')">✏️ تعديل</button>
+          <button class="action-btn delete-btn" onclick="deleteKDM('${_id}')">🗑️ حذف</button>
+        </td>
+      `;
+      kdmBody.appendChild(row);
+    });
+  }
+
+  // الهروب من أحرف HTML الخاصة
+  function escapeHTML(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[m];
+    });
+  }
+
+  // الهروب من أحرف خاصة عند تمرير النص في جافاسكربت
+  function escapeJS(text) {
+    return text.replace(/'/g, "\\'");
+  }
+
+  // إضافة أو تعديل مفتاح جديد
   kdmForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const movieName = document.getElementById('movieName').value.trim();
@@ -241,70 +373,84 @@
       return;
     }
 
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ movieName, startTime, endTime })
-    });
+    try {
+      if (isEditing && editingId) {
+        const res = await fetch(`${apiUrl}/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ movieName, startTime, endTime })
+        });
 
-    if (res.ok) {
-      kdmForm.reset();
-      loadKDMs();
-    } else {
-      alert('حدث خطأ أثناء الإضافة');
+        if (!res.ok) throw new Error('فشل في تحديث المفتاح.');
+
+        resetForm();
+        await loadKDMs();
+      } else {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ movieName, startTime, endTime })
+        });
+
+        if (!res.ok) throw new Error('فشل في إضافة المفتاح.');
+
+        kdmForm.reset();
+        await loadKDMs();
+      }
+    } catch (error) {
+      alert(error.message);
     }
   });
 
+  // حذف مفتاح
   async function deleteKDM(id) {
-    if (!confirm('هل تريد حذف المفتاح؟')) return;
-    const res = await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
-    if (res.ok) loadKDMs();
-    else alert('خطأ أثناء الحذف');
+    if (!confirm('هل أنت متأكد من حذف هذا المفتاح؟')) return;
+    try {
+      const res = await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('فشل في حذف المفتاح.');
+      await loadKDMs();
+    } catch (error) {
+      alert(error.message);
+    }
   }
 
+  // تعديل مفتاح
   function editKDM(id, movieName, startTime, endTime) {
     document.getElementById('movieName').value = movieName;
     document.getElementById('startTime').value = startTime;
     document.getElementById('endTime').value = endTime;
 
-    const btn = kdmForm.querySelector('button');
-    btn.textContent = '💾 حفظ التعديل';
-
-    const newForm = kdmForm.cloneNode(true);
-    kdmForm.parentNode.replaceChild(newForm, kdmForm);
-
-    newForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const updatedName = document.getElementById('movieName').value.trim();
-      const updatedStart = document.getElementById('startTime').value;
-      const updatedEnd = document.getElementById('endTime').value;
-
-      const res = await fetch(`${apiUrl}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieName: updatedName, startTime: updatedStart, endTime: updatedEnd })
-      });
-
-      if (res.ok) {
-        newForm.reset();
-        btn.textContent = '➕ إضافة المفتاح';
-        loadKDMs();
-      } else {
-        alert('فشل في التحديث');
-      }
-    });
+    kdmForm.querySelector('button').textContent = '💾 حفظ التعديل';
+    isEditing = true;
+    editingId = id;
   }
 
-  function filterKDMs() {
-    const val = document.getElementById('searchInput').value.toLowerCase();
-    const rows = document.querySelectorAll('#kdmBody .kdm-row');
-    rows.forEach(row => {
-      const movie = row.querySelector('td:first-child').textContent.toLowerCase();
-      row.style.display = movie.includes(val) ? '' : 'none';
-    });
+  // إعادة تعيين النموذج إلى وضع الإضافة
+  function resetForm() {
+    kdmForm.reset();
+    isEditing = false;
+    editingId = null;
+    kdmForm.querySelector('button').textContent = '➕ إضافة المفتاح';
   }
 
+  // تصفية البيانات أثناء الكتابة في مربع البحث
+  searchInput.addEventListener('input', () => {
+    const filter = searchInput.value.trim().toLowerCase();
+    if (!filter) {
+      displayKDMs(kdmsData);
+      return;
+    }
+    const filtered = kdmsData.filter(kdm => kdm.movieName.toLowerCase().includes(filter));
+    displayKDMs(filtered);
+  });
+
+  // تحميل المفاتيح عند فتح الصفحة
   loadKDMs();
+
+  // للسماح للزر تعديل بالوصول من HTML inline
+  window.editKDM = editKDM;
+  window.deleteKDM = deleteKDM;
 </script>
+
 </body>
 </html>
