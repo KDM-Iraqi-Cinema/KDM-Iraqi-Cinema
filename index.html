@@ -8,7 +8,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ادارةkdm</title>
+    <title>ادارة KDM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -18,102 +18,102 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #333;
-            color: #fff;
+            background-color: #222;
+            color: #eee;
         }
+
         .login-container {
-            background-color: #444;
+            background-color: #2b2b2b;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             width: 300px;
             text-align: center;
         }
+
         .login-container img {
             width: 80%;
             margin-bottom: 20px;
         }
+
         .input-container {
             position: relative;
         }
+
         input {
             display: block;
             margin: 10px 0;
             padding: 10px;
-            border: none;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #fff;
             border-radius: 5px;
-            width: calc(100% - 22px); /* Ensures inputs fit within the container with padding */
+            width: calc(100% - 22px);
         }
+
         .toggle-password {
             position: absolute;
             right: 10px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #007bff;
+            color: #0d6efd;
         }
+
         button {
-            background-color: #007bff;
+            background-color: #0d6efd;
             color: #fff;
             border: none;
             padding: 12px;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
             font-size: 16px;
             margin-top: 10px;
-            font-family: 'Cairo Play', sans-serif; /* Match button font with page font */
+            font-family: 'Cairo Play', sans-serif;
+            transition: background-color 0.3s ease;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #084298;
         }
+
         .error-message {
-            color: #dc3545;
+            color: #ff4d4d;
             margin-top: 10px;
         }
+
         .hidden-section {
             display: none;
         }
 
-
-        
-
-
         .footer {
-        position: fixed; /* يبقي الحقوق ثابتة في مكانها */
-        top: 10px; /* يضع الحاوية في أعلى الصفحة */
-        left: 50%; /* يضع الحاوية في منتصف الشاشة أفقياً */
-        transform: translateX(-50%); /* يحول الحاوية إلى المنتصف تماماً */
-        color: #fff;
-        font-size: 14px;
-        font-family: 'Lalezar', sans-serif; /* استخدام خط مختلف */
-        text-align: center;
-        z-index: 1000; /* يضمن ظهور الحقوق فوق المحتوى الآخر */
-    }
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #aaa;
+            font-size: 14px;
+            font-family: 'Lalezar', sans-serif;
+            text-align: center;
+            z-index: 1000;
+        }
 
-    .footer img {
-        width: 40px;
-        vertical-align: middle;
-        margin-right: 10px;
-        cursor: pointer;
-    }
+        .footer img {
+            width: 40px;
+            vertical-align: middle;
+            margin-right: 10px;
+            cursor: pointer;
+        }
 
-    .footer a {
-        color: #fff;
-        text-decoration: none;
-    }
+        .footer a {
+            color: #aaa;
+            text-decoration: none;
+        }
 
-    .footer a:hover {
-        text-decoration: underline;
-    }
-
-
-
-
-
-
-        
-
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -143,26 +143,13 @@
         </div>
     </div>
 
+    <div class="footer">
+        <a href="https://www.instagram.com/mjra_shop?igsh=MTUyY292c3h4ajdr">
+            <img src="mjralogo.png" alt="Logo">
+        </a>
+        <p>حقوق © 2024 مجرة عراقية</p>
+    </div>
 
-
-
- <div class="footer">
-    <a href="https://www.instagram.com/mjra_shop?igsh=MTUyY292c3h4ajdr">
-        <img src="mjralogo.png" alt="Logo">
-    </a>
-    <p>حقوق © 2024 مجرة عراقية</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-    
     <script>
         function togglePassword() {
             const passwordField = document.getElementById('password');
