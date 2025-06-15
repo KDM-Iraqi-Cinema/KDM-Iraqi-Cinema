@@ -2,80 +2,121 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
-  <title>إدارة مفاتيح KDM</title>
+  <title>نظام مفاتيح KDM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: Arial;
-      background-color: #111;
-      color: white;
+      background-color: #0d0d0d;
+      color: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
+      direction: rtl;
     }
-    h1 { color: #00ffcc; }
+
+    h1 {
+      color: #00ffd0;
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
     input, button {
       padding: 10px;
-      margin: 5px;
-      border: none;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 300px;
       border-radius: 4px;
+      border: none;
+      font-size: 1em;
     }
+
     input {
-      width: 200px;
+      background-color: #222;
+      color: #fff;
     }
+
     button {
-      background-color: #00ffcc;
+      background-color: #00ffd0;
       color: #000;
       cursor: pointer;
     }
+
     .kdm-box {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #222;
-      border-radius: 5px;
-      border: 1px solid #00ffcc;
+      background-color: #1c1c1c;
+      border: 1px solid #00ffd0;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
     }
+
     .expired-soon {
-      background-color: #800000 !important;
+      background-color: #990000;
+    }
+
+    .kdm-box button {
+      margin-left: 10px;
+      background-color: #ff4d4d;
+      color: #fff;
+    }
+
+    .kdm-box button.edit {
+      background-color: #ffaa00;
+    }
+
+    @media (max-width: 600px) {
+      input, button {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <h1>نظام إدارة مفاتيح KDM</h1>
+
   <form id="kdmForm">
     <input type="text" id="movieName" placeholder="اسم الفيلم" required />
     <input type="datetime-local" id="startTime" required />
     <input type="datetime-local" id="endTime" required />
-    <button type="submit">إضافة KDM</button>
+    <button type="submit">➕ إضافة مفتاح</button>
   </form>
 
-  <div id="kdmList"></div>
+  <div id="kdmList">جاري التحميل...</div>
 
   <script>
     const apiUrl = "https://kdm-iraqi-cinema.onrender.com/kdms";
 
-    async function fetchKDMs() {
-      const res = await fetch(apiUrl);
-      const data = await res.json();
-      displayKDMs(data);
+    function createKdmBox(kdm) {
+      const box = document.createElement("div");
+      box.className = "kdm-box";
+
+      const endDate = new Date(kdm.endTime);
+      const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+      if (daysLeft <= 5) box.classList.add("expired-soon");
+
+      box.innerHTML = `
+        <strong>🎬 ${kdm.movieName}</strong><br>
+        🕒 من: ${new Date(kdm.startTime).toLocaleString()}<br>
+        ⏰ إلى: ${new Date(kdm.endTime).toLocaleString()}<br><br>
+        <button onclick="deleteKDM('${kdm._id}')">🗑 حذف</button>
+        <button class="edit" onclick="editKDM('${kdm._id}', '${kdm.movieName}', '${kdm.startTime}', '${kdm.endTime}')">✏ تعديل</button>
+      `;
+      return box;
     }
 
-    function displayKDMs(kdms) {
-      const list = document.getElementById("kdmList");
-      list.innerHTML = "";
-      kdms.forEach(kdm => {
-        const box = document.createElement("div");
-        box.className = "kdm-box";
-
-        const daysLeft = Math.ceil((new Date(kdm.endTime) - new Date()) / (1000 * 60 * 60 * 24));
-        if (daysLeft <= 5) box.classList.add("expired-soon");
-
-        box.innerHTML = `
-          <strong>🎬 ${kdm.movieName}</strong><br/>
-          من: ${new Date(kdm.startTime).toLocaleString()}<br/>
-          إلى: ${new Date(kdm.endTime).toLocaleString()}<br/>
-          <button onclick="deleteKDM('${kdm._id}')">🗑 حذف</button>
-          <button onclick="editKDM('${kdm._id}', '${kdm.movieName}', '${kdm.startTime}', '${kdm.endTime}')">✏ تعديل</button>
-        `;
-        list.appendChild(box);
-      });
+    async function fetchKDMs() {
+      try {
+        const res = await fetch(apiUrl);
+        const kdms = await res.json();
+        const list = document.getElementById("kdmList");
+        list.innerHTML = "";
+        kdms.forEach(kdm => {
+          list.appendChild(createKdmBox(kdm));
+        });
+      } catch (err) {
+        document.getElementById("kdmList").innerText = "فشل في تحميل البيانات.";
+      }
     }
 
     document.getElementById("kdmForm").addEventListener("submit", async e => {
@@ -83,11 +124,13 @@
       const movieName = document.getElementById("movieName").value;
       const startTime = document.getElementById("startTime").value;
       const endTime = document.getElementById("endTime").value;
+
       await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ movieName, startTime, endTime })
       });
+
       e.target.reset();
       fetchKDMs();
     });
@@ -97,17 +140,18 @@
       fetchKDMs();
     }
 
-    function editKDM(id, movieName, startTime, endTime) {
-      const newMovie = prompt("اسم الفيلم:", movieName);
-      const newStart = prompt("وقت البدء:", startTime);
-      const newEnd = prompt("وقت الانتهاء:", endTime);
-      if (newMovie && newStart && newEnd) {
-        fetch(`${apiUrl}/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ movieName: newMovie, startTime: newStart, endTime: newEnd })
-        }).then(fetchKDMs);
-      }
+    async function editKDM(id, currentName, currentStart, currentEnd) {
+      const movieName = prompt("تعديل اسم الفيلم:", currentName) || currentName;
+      const startTime = prompt("تعديل وقت البدء:", currentStart) || currentStart;
+      const endTime = prompt("تعديل وقت الانتهاء:", currentEnd) || currentEnd;
+
+      await fetch(`${apiUrl}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ movieName, startTime, endTime })
+      });
+
+      fetchKDMs();
     }
 
     fetchKDMs();
