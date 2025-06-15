@@ -2,226 +2,167 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>KDM Iraqi Cinema</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>إدارة KDM - السينما العراقية</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       background-color: #121212;
-      color: #f0f0f0;
-      margin: 0;
+      color: #ffffff;
+      font-family: 'Arial', sans-serif;
       padding: 20px;
     }
 
     h1 {
       text-align: center;
-      color: #00c3ff;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      color: #00ffff;
     }
 
     form {
-      max-width: 500px;
-      margin: auto;
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
-    }
-
-    label {
-      font-size: 14px;
-      margin-bottom: 5px;
-      color: #ccc;
+      gap: 10px;
+      background-color: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
     }
 
     input, button {
-      padding: 12px;
+      padding: 10px;
       border: none;
-      border-radius: 8px;
+      border-radius: 5px;
       font-size: 16px;
     }
 
     input {
-      background-color: #2e2e2e;
+      background-color: #2a2a2a;
       color: #fff;
     }
 
-    input:focus {
-      outline: 2px solid #00c3ff;
+    input::placeholder {
+      color: #888;
     }
 
     button {
-      background-color: #00c3ff;
+      background-color: #00bcd4;
       color: white;
       cursor: pointer;
-      transition: 0.3s;
     }
 
     button:hover {
-      background-color: #0095c9;
+      background-color: #0097a7;
     }
 
-    .kdm-list {
-      margin-top: 40px;
-      max-width: 700px;
-      margin-inline: auto;
+    .kdm {
+      background-color: #1f1f1f;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border-left: 5px solid #00bcd4;
     }
 
-    .kdm-item {
-      background: #222;
-      margin-bottom: 15px;
-      padding: 15px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      transition: 0.3s;
+    .kdm.expiring {
+      border-left-color: red;
+      background-color: #2a1212;
     }
 
-    .kdm-item.red {
-      background-color: #4a1a1a;
-      border-right: 5px solid red;
+    .kdm-actions {
+      margin-top: 10px;
     }
 
-    .kdm-name {
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    .kdm-time {
-      font-size: 14px;
-      color: #bbb;
-      margin-top: 5px;
-    }
-
-    .actions button {
-      background-color: #444;
-      margin: 3px;
-      font-size: 14px;
-      padding: 6px 10px;
-    }
-
-    .actions button:hover {
-      background-color: #666;
+    .error {
+      color: red;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
 
-  <h1>إدارة مفاتيح KDM - السينما العراقية</h1>
+<h1>نظام إدارة مفاتيح KDM</h1>
 
-  <form id="kdmForm">
-    <div>
-      <label for="name">اسم الفيلم أو المفتاح:</label>
-      <input type="text" id="name" required placeholder="مثلاً: Fast X أو Avatar 2" />
-    </div>
+<form id="kdmForm">
+  <input type="text" id="movieName" placeholder="اسم الفيلم" required />
+  <input type="datetime-local" id="startTime" placeholder="تاريخ ووقت البدء" required />
+  <input type="datetime-local" id="endTime" placeholder="تاريخ ووقت الانتهاء" required />
+  <button type="submit">➕ إضافة المفتاح</button>
+</form>
 
-    <div>
-      <label for="startTime">تاريخ ووقت البداية:</label>
-      <input type="datetime-local" id="startTime" required title="حدد وقت بداية صلاحية المفتاح" />
-    </div>
+<div id="kdmList"></div>
 
-    <div>
-      <label for="endTime">تاريخ ووقت الانتهاء:</label>
-      <input type="datetime-local" id="endTime" required title="حدد وقت انتهاء صلاحية المفتاح" />
-    </div>
+<script>
+  const apiUrl = 'https://kdm-iraqi-cinema.onrender.com/kdms';
+  const kdmForm = document.getElementById('kdmForm');
+  const kdmList = document.getElementById('kdmList');
 
-    <button type="submit">حفظ المفتاح</button>
-  </form>
+  // تحميل البيانات عند التشغيل
+  fetchKDMs();
 
-  <div class="kdm-list" id="kdmList"></div>
+  // إضافة KDM جديد
+  kdmForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const movieName = document.getElementById('movieName').value.trim();
+    const startTime = document.getElementById('startTime').value;
+    const endTime = document.getElementById('endTime').value;
 
-  <script>
-    const apiUrl = "https://kdm-iraqi-cinema.onrender.com/kdms";
-    const form = document.getElementById("kdmForm");
-    const nameInput = document.getElementById("name");
-    const startTimeInput = document.getElementById("startTime");
-    const endTimeInput = document.getElementById("endTime");
-    const kdmList = document.getElementById("kdmList");
-
-    let editingId = null;
-
-    async function fetchKDMs() {
-      try {
-        const res = await fetch(apiUrl);
-        const kdms = await res.json();
-        kdmList.innerHTML = "";
-        const now = new Date();
-
-        kdms.forEach(kdm => {
-          const end = new Date(kdm.endTime);
-          const daysLeft = (end - now) / (1000 * 60 * 60 * 24);
-          const isRed = daysLeft <= 5;
-
-          const div = document.createElement("div");
-          div.className = "kdm-item" + (isRed ? " red" : "");
-          div.innerHTML = `
-            <div>
-              <div class="kdm-name">${kdm.name}</div>
-              <div class="kdm-time">من: ${new Date(kdm.startTime).toLocaleString()}<br>إلى: ${new Date(kdm.endTime).toLocaleString()}</div>
-            </div>
-            <div class="actions">
-              <button onclick="editKDM('${kdm._id}', '${kdm.name.replace(/'/g, "\\'")}', '${kdm.startTime}', '${kdm.endTime}')">تعديل</button>
-              <button onclick="deleteKDM('${kdm._id}')">حذف</button>
-            </div>
-          `;
-          kdmList.appendChild(div);
-        });
-      } catch (error) {
-        console.error("فشل في تحميل البيانات:", error);
-        kdmList.innerHTML = "<p>حدث خطأ أثناء تحميل المفاتيح.</p>";
-      }
+    if (!movieName || !startTime || !endTime) {
+      alert('يرجى ملء جميع الحقول');
+      return;
     }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const kdm = {
-        name: nameInput.value,
-        startTime: startTimeInput.value,
-        endTime: endTimeInput.value
-      };
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movieName, startTime, endTime }),
+      });
 
-      try {
-        if (editingId) {
-          await fetch(`${apiUrl}/${editingId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(kdm)
-          });
-          editingId = null;
-        } else {
-          await fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(kdm)
-          });
-        }
+      if (!res.ok) throw new Error(`فشل في الإضافة - ${res.statusText}`);
 
-        form.reset();
-        fetchKDMs();
-      } catch (err) {
-        alert("فشل في إرسال البيانات إلى السيرفر");
-        console.error(err);
-      }
-    });
-
-    async function deleteKDM(id) {
-      await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
+      // إعادة التحميل
+      kdmForm.reset();
       fetchKDMs();
+    } catch (err) {
+      alert(`حدث خطأ أثناء الإضافة: ${err.message}`);
+    }
+  });
+
+  // تحميل وعرض قائمة المفاتيح
+  async function fetchKDMs() {
+    try {
+      const res = await fetch(apiUrl);
+      if (!res.ok) throw new Error(`فشل التحميل: ${res.statusText}`);
+      const kdms = await res.json();
+      renderKDMs(kdms);
+    } catch (err) {
+      kdmList.innerHTML = `<p class="error">حدث خطأ أثناء تحميل المفاتيح: ${err.message}</p>`;
+    }
+  }
+
+  // عرض المفاتيح
+  function renderKDMs(kdms) {
+    kdmList.innerHTML = '';
+    if (!Array.isArray(kdms) || kdms.length === 0) {
+      kdmList.innerHTML = '<p>لا توجد مفاتيح حالياً.</p>';
+      return;
     }
 
-    function editKDM(id, name, start, end) {
-      editingId = id;
-      nameInput.value = name;
-      startTimeInput.value = start.slice(0, 16);
-      endTimeInput.value = end.slice(0, 16);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    kdms.forEach(kdm => {
+      const div = document.createElement('div');
+      const endDate = new Date(kdm.endTime);
+      const now = new Date();
+      const daysLeft = (endDate - now) / (1000 * 60 * 60 * 24);
+      const isExpiring = daysLeft <= 5;
 
-    fetchKDMs();
-  </script>
+      div.className = `kdm ${isExpiring ? 'expiring' : ''}`;
+      div.innerHTML = `
+        🎬 <strong>${kdm.movieName}</strong><br/>
+        ⏱️ من: ${new Date(kdm.startTime).toLocaleString()}<br/>
+        🛑 إلى: ${new Date(kdm.endTime).toLocaleString()}
+      `;
+      kdmList.appendChild(div);
+    });
+  }
+</script>
+
 </body>
 </html>
