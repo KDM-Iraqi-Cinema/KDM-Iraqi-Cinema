@@ -1,128 +1,231 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>إدارة مفاتيح KDM - السينما العراقية</title>
-  <style>
-    body {
-      background-color: #0d0d0d;
-      color: #f5f5f5;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>إدارة مفاتيح KDM - السينما الرقمية</title>
+<style>
+  /* تصميم داكن */
+  body {
+    background-color: #121212;
+    color: #ddd;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #f0c14b;
+    margin-bottom: 30px;
+    user-select: none;
+  }
+  form {
+    background-color: #222;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 0 10px #5a4b1c;
+  }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #f0c14b;
+  }
+  input[type="text"], input[type="datetime-local"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #1f1f1f;
+    color: #eee;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+  input[type="text"]::placeholder,
+  input[type="datetime-local"]::placeholder {
+    color: #999;
+  }
+  input[type="text"]:focus, input[type="datetime-local"]:focus {
+    outline: none;
+    border-color: #f0c14b;
+    background-color: #2c2c2c;
+  }
+  button {
+    background-color: #bfae48; /* ذهبي قريب */
+    color: #222;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background-color: #d4c36e;
+  }
+  .kdm-list {
+    max-width: 900px;
+    margin: auto;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .kdm-list th, .kdm-list td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #333;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .kdm-list th {
+    background-color: #2e2e2e;
+    color: #f0c14b;
+  }
+  .kdm-row {
+    background-color: #1e1e1e;
+    transition: background-color 0.3s ease;
+  }
+  /* لون أحمر كامل قبل 5 أيام من الانتهاء */
+  .kdm-row.ending-soon {
+    background-color: #a83232 !important;
+    color: #fff;
+  }
+  .action-btn {
+    margin: 0 5px;
+    padding: 6px 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  .edit-btn {
+    background-color: #bfae48;
+    color: #222;
+  }
+  .edit-btn:hover {
+    background-color: #d4c36e;
+  }
+  .delete-btn {
+    background-color: #c43e3e;
+    color: white;
+  }
+  .delete-btn:hover {
+    background-color: #f04e4e;
+  }
+  /* توضيح الحقول */
+  .desc-text {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    user-select: none;
+  }
+  @media (max-width: 600px) {
+    .kdm-list th, .kdm-list td {
+      font-size: 0.9rem;
+      padding: 8px 10px;
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #ffd700;
+    button, .action-btn {
+      padding: 8px 16px;
+      font-size: 0.9rem;
     }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background-color: #1a1a1a;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
-    }
-
-    label {
-      font-size: 14px;
-      color: #cccccc;
-      margin-bottom: -6px;
-      margin-top: 4px;
-    }
-
-    input, button {
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    input {
-      background-color: #2c2c2c;
-      color: #ffffff;
-    }
-
-    input::placeholder {
-      color: #888;
-    }
-
-    button {
-      background-color: #bfa638;
-      color: black;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #d1b244;
-    }
-
-    .kdm {
-      background-color: #1f1f1f;
-      padding: 14px;
-      margin-top: 12px;
-      border-radius: 8px;
-      border: 2px solid #444;
-      transition: background-color 0.3s, border 0.3s;
-    }
-
-    .kdm.expiring {
-      background-color: #440000;
-      border: 2px solid #ff3c3c;
-    }
-
-    .kdm strong {
-      color: #ffd700;
-    }
-
-    .kdm-actions {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .kdm-actions button {
-      flex: 1;
-      font-size: 14px;
-    }
-
-    .error {
-      color: red;
-      margin-top: 15px;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-<h1>🎬 إدارة مفاتيح KDM - السينما العراقية</h1>
+<h1>إدارة مفاتيح KDM - السينما الرقمية</h1>
 
 <form id="kdmForm">
   <label for="movieName">اسم الفيلم:</label>
-  <input type="text" id="movieName" placeholder="مثال: Avatar 2" required />
+  <input type="text" id="movieName" placeholder="أدخل اسم الفيلم" required />
 
-  <label for="startTime">وقت بدء صلاحية المفتاح (KDM):</label>
-  <input type="datetime-local" id="startTime" required />
+  <div class="desc-text">اختر تاريخ ووقت بدء صلاحية المفتاح (KDM):</div>
+  <input type="datetime-local" id="startTime" required placeholder="تاريخ ووقت البداية" />
 
-  <label for="endTime">وقت انتهاء صلاحية المفتاح (KDM):</label>
-  <input type="datetime-local" id="endTime" required />
+  <div class="desc-text">اختر تاريخ ووقت نهاية صلاحية المفتاح (KDM):</div>
+  <input type="datetime-local" id="endTime" required placeholder="تاريخ ووقت الانتهاء" />
 
   <button type="submit">➕ إضافة المفتاح</button>
 </form>
 
-<div id="kdmList"></div>
+<table class="kdm-list" id="kdmTable" aria-label="قائمة مفاتيح KDM">
+  <thead>
+    <tr>
+      <th>اسم الفيلم</th>
+      <th>تاريخ البداية</th>
+      <th>تاريخ الانتهاء</th>
+      <th>الإجراءات</th>
+    </tr>
+  </thead>
+  <tbody id="kdmBody">
+    <!-- مفاتيح KDM ستضاف هنا -->
+  </tbody>
+</table>
 
 <script>
   const apiUrl = 'https://kdm-iraqi-cinema.onrender.com/kdms';
+
   const kdmForm = document.getElementById('kdmForm');
-  const kdmList = document.getElementById('kdmList');
+  const kdmBody = document.getElementById('kdmBody');
 
-  fetchKDMs();
+  // تحميل المفاتيح من السيرفر وعرضها
+  async function loadKDMs() {
+    kdmBody.innerHTML = '';
+    try {
+      const res = await fetch(apiUrl);
+      if (!res.ok) throw new Error('فشل في تحميل البيانات.');
+      const kdms = await res.json();
 
+      if (kdms.length === 0) {
+        kdmBody.innerHTML = `<tr><td colspan="4" style="color:#aaa;">لا توجد مفاتيح KDM مسجلة</td></tr>`;
+        return;
+      }
+
+      const now = new Date();
+      kdms.forEach(({ _id, movieName, startTime, endTime }) => {
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+        const isEndingSoon = diffDays <= 5 && diffDays >= 0;
+
+        const row = document.createElement('tr');
+        row.className = 'kdm-row' + (isEndingSoon ? ' ending-soon' : '');
+
+        row.innerHTML = `
+          <td>${movieName}</td>
+          <td>${start.toLocaleString('ar-EG')}</td>
+          <td>${end.toLocaleString('ar-EG')}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editKDM('${_id}', '${escapeHTML(movieName)}', '${startTime}', '${endTime}')">✏️ تعديل</button>
+            <button class="action-btn delete-btn" onclick="deleteKDM('${_id}')">🗑️ حذف</button>
+          </td>
+        `;
+        kdmBody.appendChild(row);
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  // الهروب من أحرف HTML الخاصة
+  function escapeHTML(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[m];
+    });
+  }
+
+  // إضافة مفتاح جديد
   kdmForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const movieName = document.getElementById('movieName').value.trim();
@@ -130,7 +233,7 @@
     const endTime = document.getElementById('endTime').value;
 
     if (!movieName || !startTime || !endTime) {
-      alert('يرجى ملء جميع الحقول');
+      alert('يرجى تعبئة جميع الحقول.');
       return;
     }
 
@@ -138,68 +241,29 @@
       const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieName, startTime, endTime }),
+        body: JSON.stringify({ movieName, startTime, endTime })
       });
-
-      if (!res.ok) throw new Error(`فشل في الإضافة - ${res.statusText}`);
-
+      if (!res.ok) throw new Error('فشل في إضافة المفتاح.');
       kdmForm.reset();
-      fetchKDMs(); // تحديث القائمة مباشرة
-    } catch (err) {
-      alert(`حدث خطأ أثناء الإضافة: ${err.message}`);
+      await loadKDMs();
+    } catch (error) {
+      alert(error.message);
     }
   });
 
-  async function fetchKDMs() {
-    try {
-      const res = await fetch(apiUrl);
-      if (!res.ok) throw new Error(`فشل التحميل: ${res.statusText}`);
-      const kdms = await res.json();
-      renderKDMs(kdms);
-    } catch (err) {
-      kdmList.innerHTML = `<p class="error">حدث خطأ أثناء تحميل المفاتيح: ${err.message}</p>`;
-    }
-  }
-
-  function renderKDMs(kdms) {
-    kdmList.innerHTML = '';
-    if (!Array.isArray(kdms) || kdms.length === 0) {
-      kdmList.innerHTML = '<p>لا توجد مفاتيح حالياً.</p>';
-      return;
-    }
-
-    kdms.forEach(kdm => {
-      const div = document.createElement('div');
-      const endDate = new Date(kdm.endTime);
-      const now = new Date();
-      const daysLeft = (endDate - now) / (1000 * 60 * 60 * 24);
-      const isExpiring = daysLeft <= 5;
-
-      div.className = `kdm ${isExpiring ? 'expiring' : ''}`;
-      div.innerHTML = `
-        <strong>🎞️ ${kdm.movieName}</strong><br/>
-        ⏳ من: ${new Date(kdm.startTime).toLocaleString()}<br/>
-        ⌛ إلى: ${new Date(kdm.endTime).toLocaleString()}
-        <div class="kdm-actions">
-          <button onclick="deleteKDM('${kdm._id}')">🗑️ حذف</button>
-          <button onclick="editKDM('${kdm._id}', '${kdm.movieName}', '${kdm.startTime}', '${kdm.endTime}')">✏️ تعديل</button>
-        </div>
-      `;
-      kdmList.appendChild(div);
-    });
-  }
-
+  // حذف مفتاح
   async function deleteKDM(id) {
     if (!confirm('هل أنت متأكد من حذف هذا المفتاح؟')) return;
     try {
       const res = await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error(`فشل الحذف - ${res.statusText}`);
-      fetchKDMs();
-    } catch (err) {
-      alert(`حدث خطأ أثناء الحذف: ${err.message}`);
+      if (!res.ok) throw new Error('فشل في حذف المفتاح.');
+      await loadKDMs();
+    } catch (error) {
+      alert(error.message);
     }
   }
 
+  // تعديل مفتاح
   function editKDM(id, movieName, startTime, endTime) {
     document.getElementById('movieName').value = movieName;
     document.getElementById('startTime').value = startTime;
@@ -207,11 +271,21 @@
 
     const button = kdmForm.querySelector('button');
     button.textContent = '💾 حفظ التعديل';
-    kdmForm.onsubmit = async (e) => {
+
+    // إلغاء أي مستمع حدث submit موجود سابقاً عن طريق استبدال النموذج
+    const newForm = kdmForm.cloneNode(true);
+    kdmForm.parentNode.replaceChild(newForm, kdmForm);
+
+    newForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const updatedName = document.getElementById('movieName').value.trim();
       const updatedStart = document.getElementById('startTime').value;
       const updatedEnd = document.getElementById('endTime').value;
+
+      if (!updatedName || !updatedStart || !updatedEnd) {
+        alert('يرجى تعبئة جميع الحقول.');
+        return;
+      }
 
       try {
         const res = await fetch(`${apiUrl}/${id}`, {
@@ -223,18 +297,19 @@
             endTime: updatedEnd
           }),
         });
+
         if (!res.ok) throw new Error(`فشل التحديث - ${res.statusText}`);
-        kdmForm.reset();
+        newForm.reset();
         button.textContent = '➕ إضافة المفتاح';
-        kdmForm.onsubmit = defaultSubmitHandler;
-        fetchKDMs();
+        await loadKDMs();
       } catch (err) {
         alert(`خطأ أثناء التحديث: ${err.message}`);
       }
-    };
+    });
   }
 
-  const defaultSubmitHandler = kdmForm.onsubmit;
+  // تحميل المفاتيح عند فتح الصفحة
+  loadKDMs();
 </script>
 
 </body>
