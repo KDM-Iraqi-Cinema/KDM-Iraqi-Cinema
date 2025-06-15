@@ -429,5 +429,38 @@
   window.deleteKDM = deleteKDM;
 </script>
 
+
+
+<!-- أضف هذا الزر في مكان مناسب في صفحة KDM -->
+<button id="logoutBtn" style="
+    background-color: #0d6efd; 
+    color: white; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    font-family: 'Cairo Play', sans-serif;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+">تسجيل خروج</button>
+
+<script>
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        localStorage.removeItem('loggedIn');  // مسح حالة الدخول
+        window.location.href = 'index.html';  // تحويل إلى صفحة تسجيل الدخول (غير اسم الملف إذا مختلف)
+    });
+
+    // تحقق من تسجيل الدخول عند فتح الصفحة
+    if (localStorage.getItem('loggedIn') !== 'true') {
+        window.location.href = 'index.html'; // إعادة توجيه إذا لم يكن مسجلاً الدخول
+    }
+</script>
+
+
+
+  
+
 </body>
 </html>
