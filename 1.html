@@ -249,6 +249,28 @@
   <button type="submit">➕ إضافة المفتاح</button>
 </form>
 
+
+
+<!-- أضف هذا الزر في مكان مناسب في صفحة KDM -->
+<button id="logoutBtn" style="
+    background-color: #0d6efd; 
+    color: white; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    font-family: 'Cairo Play', sans-serif;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+">تسجيل خروج</button>
+
+
+
+
+  
+
 <input type="text" id="searchInput" placeholder="🔍 ابحث باسم الفيلم..." aria-label="بحث باسم الفيلم" />
 
 <table class="kdm-list" id="kdmTable" aria-label="قائمة مفاتيح KDM">
@@ -431,20 +453,7 @@
 
 
 
-<!-- أضف هذا الزر في مكان مناسب في صفحة KDM -->
-<button id="logoutBtn" style="
-    background-color: #0d6efd; 
-    color: white; 
-    border: none; 
-    padding: 8px 16px; 
-    border-radius: 5px; 
-    cursor: pointer;
-    font-family: 'Cairo Play', sans-serif;
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    z-index: 1000;
-">تسجيل خروج</button>
+
 
 <script>
     document.getElementById('logoutBtn').addEventListener('click', function() {
