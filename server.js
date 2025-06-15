@@ -9,7 +9,11 @@ app.use(cors());
 app.use(express.json());
 
 // 🟢 قاعدة البيانات
-mongoose.connect("mongodb+srv://<username>:<password>@cluster0.abkeh.mongodb.net/kdmDB?retryWrites=true&w=majority")
+
+
+
+
+mongoose.connect("mongodb+srv://almohsen:Iiraq2020@cluster0.abkeh.mongodb.net/Cluster0?retryWrites=true&w=majority")
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
