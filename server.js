@@ -8,7 +8,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("YOUR_MONGO_URL", {
+mongoose.connect("mongodb+srv://<db_username>:<db_password>@cluster0.abkeh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
