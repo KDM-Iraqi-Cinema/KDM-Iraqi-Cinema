@@ -101,51 +101,51 @@
   <div id="kdmList"></div>
 
   <script>
+    const apiUrl = "https://YOUR_SERVER_URL/kdms"; // ← غيّر هذا لرابط السيرفر الخاص بك
+
     const form = document.getElementById("kdmForm");
     const kdmList = document.getElementById("kdmList");
-    let editIndex = -1;
+    let editId = null;
 
     function loadKDMs() {
-      const kdms = JSON.parse(localStorage.getItem("kdms") || "[]");
-      kdmList.innerHTML = "";
-      kdms.forEach((kdm, index) => {
-        const end = new Date(kdm.endTime);
-        const now = new Date();
-        const diffDays = Math.floor((end - now) / (1000 * 60 * 60 * 24));
-        const isExpiring = diffDays <= 5;
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(kdms => {
+          kdmList.innerHTML = "";
+          kdms.forEach(kdm => {
+            const end = new Date(kdm.endTime);
+            const now = new Date();
+            const diffDays = Math.floor((end - now) / (1000 * 60 * 60 * 24));
+            const isExpiring = diffDays <= 5;
 
-        const div = document.createElement("div");
-        div.className = "kdm-entry";
-        if (isExpiring) div.classList.add("expiring");
+            const div = document.createElement("div");
+            div.className = "kdm-entry" + (isExpiring ? " expiring" : "");
 
-        div.innerHTML = `
-          <strong>الفيلم:</strong> ${kdm.movieName}<br/>
-          <strong>من:</strong> ${new Date(kdm.startTime).toLocaleString()}<br/>
-          <strong>إلى:</strong> ${new Date(kdm.endTime).toLocaleString()}<br/>
-          <div class="action-buttons">
-            <button class="edit-button" onclick="editKDM(${index})">تعديل</button>
-            <button onclick="deleteKDM(${index})">حذف</button>
-          </div>
-        `;
-        kdmList.appendChild(div);
-      });
+            div.innerHTML = `
+              <strong>الفيلم:</strong> ${kdm.movieName}<br/>
+              <strong>من:</strong> ${new Date(kdm.startTime).toLocaleString()}<br/>
+              <strong>إلى:</strong> ${new Date(kdm.endTime).toLocaleString()}<br/>
+              <div class="action-buttons">
+                <button class="edit-button" onclick="editKDM('${kdm._id}', '${kdm.movieName}', '${kdm.startTime}', '${kdm.endTime}')">تعديل</button>
+                <button onclick="deleteKDM('${kdm._id}')">حذف</button>
+              </div>
+            `;
+            kdmList.appendChild(div);
+          });
+        });
     }
 
-    function deleteKDM(index) {
-      const kdms = JSON.parse(localStorage.getItem("kdms") || "[]");
-      kdms.splice(index, 1);
-      localStorage.setItem("kdms", JSON.stringify(kdms));
-      loadKDMs();
-    }
-
-    function editKDM(index) {
-      const kdms = JSON.parse(localStorage.getItem("kdms") || "[]");
-      const kdm = kdms[index];
-      document.getElementById("movieName").value = kdm.movieName;
-      document.getElementById("startTime").value = kdm.startTime;
-      document.getElementById("endTime").value = kdm.endTime;
-      editIndex = index;
+    function editKDM(id, name, start, end) {
+      document.getElementById("movieName").value = name;
+      document.getElementById("startTime").value = start;
+      document.getElementById("endTime").value = end;
+      editId = id;
       window.scrollTo(0, 0);
+    }
+
+    function deleteKDM(id) {
+      fetch(`${apiUrl}/${id}`, { method: "DELETE" })
+        .then(() => loadKDMs());
     }
 
     form.addEventListener("submit", (e) => {
@@ -154,20 +154,28 @@
       const startTime = document.getElementById("startTime").value;
       const endTime = document.getElementById("endTime").value;
 
-      if (!movieName || !startTime || !endTime) return;
+      const data = { movieName, startTime, endTime };
 
-      const kdms = JSON.parse(localStorage.getItem("kdms") || "[]");
-
-      if (editIndex >= 0) {
-        kdms[editIndex] = { movieName, startTime, endTime };
-        editIndex = -1;
+      if (editId) {
+        fetch(`${apiUrl}/${editId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }).then(() => {
+          form.reset();
+          editId = null;
+          loadKDMs();
+        });
       } else {
-        kdms.push({ movieName, startTime, endTime });
+        fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }).then(() => {
+          form.reset();
+          loadKDMs();
+        });
       }
-
-      localStorage.setItem("kdms", JSON.stringify(kdms));
-      form.reset();
-      loadKDMs();
     });
 
     loadKDMs();
