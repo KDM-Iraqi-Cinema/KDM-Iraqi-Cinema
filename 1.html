@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo+Play:wght@1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ادارةkdm</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Cairo Play', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333;
+            color: #fff;
+        }
+        .login-container {
+            background-color: #444;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            text-align: center;
+        }
+        .login-container img {
+            width: 80%;
+            margin-bottom: 20px;
+        }
+        .input-container {
+            position: relative;
+        }
+        input {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: calc(100% - 22px); /* Ensures inputs fit within the container with padding */
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #007bff;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+            font-family: 'Cairo Play', sans-serif; /* Match button font with page font */
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+        .hidden-section {
+            display: none;
+        }
+
+
+        
+
+
+        .footer {
+        position: fixed; /* يبقي الحقوق ثابتة في مكانها */
+        top: 10px; /* يضع الحاوية في أعلى الصفحة */
+        left: 50%; /* يضع الحاوية في منتصف الشاشة أفقياً */
+        transform: translateX(-50%); /* يحول الحاوية إلى المنتصف تماماً */
+        color: #fff;
+        font-size: 14px;
+        font-family: 'Lalezar', sans-serif; /* استخدام خط مختلف */
+        text-align: center;
+        z-index: 1000; /* يضمن ظهور الحقوق فوق المحتوى الآخر */
+    }
+
+    .footer img {
+        width: 40px;
+        vertical-align: middle;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .footer a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .footer a:hover {
+        text-decoration: underline;
+    }
+
+
+
+
+
+
+        
+
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="mjralogo.png" alt="Logo">
+        <div class="input-container">
+            <input type="text" id="username" placeholder="اسم المستخدم">
+        </div>
+        <div class="input-container">
+            <input type="password" id="password" placeholder="كلمة السر">
+            <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
+        </div>
+        <button onclick="login()">تسجيل الدخول</button>
+        <p class="error-message" id="error-message"></p>
+
+        <button onclick="toggleHiddenSection()">تغيير المعلومات/إعادة تعيين كلمة السر</button>
+
+        <div id="hidden-section" class="hidden-section">
+            <h3>تغيير المعلومات</h3>
+            <input type="text" id="current-password" placeholder="كلمة السر الحالية">
+            <input type="text" id="new-username" placeholder="اسم المستخدم الجديد">
+            <input type="password" id="new-password" placeholder="كلمة السر الجديدة">
+            <button onclick="changeCredentials()">تغيير</button>
+
+            <h3>نسيان كلمة السر</h3>
+            <button onclick="resetPassword()">إعادة تعيين كلمة السر</button>
+        </div>
+    </div>
+
+
+
+
+ <div class="footer">
+    <a href="https://www.instagram.com/mjra_shop?igsh=MTUyY292c3h4ajdr">
+        <img src="mjralogo.png" alt="Logo">
+    </a>
+    <p>حقوق © 2024 مجرة عراقية</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+    
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const toggleIcon = document.querySelector('.toggle-password');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            const storedUsername = localStorage.getItem('username') || '1111';
+            const storedPassword = localStorage.getItem('password') || '1111';
+
+            if (username === storedUsername && password === storedPassword) {
+                localStorage.setItem('loggedIn', 'true');
+                window.location.href = '1.html';
+            } else {
+                errorMessage.textContent = 'اسم المستخدم أو كلمة السر غير صحيحة';
+            }
+        }
+
+        function changeCredentials() {
+            const currentPassword = document.getElementById('current-password').value;
+            const newUsername = document.getElementById('new-username').value;
+            const newPassword = document.getElementById('new-password').value;
+
+            const storedPassword = localStorage.getItem('password') || '1111';
+
+            if (currentPassword === storedPassword) {
+                if (newUsername) {
+                    localStorage.setItem('username', newUsername);
+                }
+                if (newPassword) {
+                    localStorage.setItem('password', newPassword);
+                }
+                alert('تم تغيير المعلومات بنجاح');
+            } else {
+                alert('كلمة السر الحالية غير صحيحة');
+            }
+        }
+
+        function resetPassword() {
+            const defaultUsername = '2000';
+            const defaultPassword = '2000';
+            localStorage.setItem('username', defaultUsername);
+            localStorage.setItem('password', defaultPassword);
+            alert('تم إعادة تعيين كلمة السر إلى الإعدادات الافتراضية');
+        }
+
+        function toggleHiddenSection() {
+            const hiddenSection = document.getElementById('hidden-section');
+            hiddenSection.style.display = hiddenSection.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
