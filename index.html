@@ -6,37 +6,45 @@
   <title>إدارة مفاتيح KDM - السينما العراقية</title>
   <style>
     body {
-      background-color: #121212;
-      color: #ffffff;
-      font-family: 'Arial', sans-serif;
+      background-color: #0d0d0d;
+      color: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 20px;
-      color: #00ffff;
+      color: #ffd700;
     }
 
     form {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      background-color: #1e1e1e;
-      padding: 15px;
+      gap: 12px;
+      background-color: #1a1a1a;
+      padding: 20px;
       border-radius: 10px;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+    }
+
+    label {
+      font-size: 14px;
+      color: #cccccc;
+      margin-bottom: -6px;
+      margin-top: 4px;
     }
 
     input, button {
       padding: 10px;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       font-size: 16px;
     }
 
     input {
-      background-color: #2a2a2a;
-      color: #fff;
+      background-color: #2c2c2c;
+      color: #ffffff;
     }
 
     input::placeholder {
@@ -44,26 +52,32 @@
     }
 
     button {
-      background-color: #00bcd4;
-      color: white;
-      cursor: pointer;
+      background-color: #bfa638;
+      color: black;
+      font-weight: bold;
+      transition: background-color 0.3s;
     }
 
     button:hover {
-      background-color: #0097a7;
+      background-color: #d1b244;
     }
 
     .kdm {
       background-color: #1f1f1f;
-      padding: 10px;
-      margin-top: 10px;
+      padding: 14px;
+      margin-top: 12px;
       border-radius: 8px;
-      border-left: 5px solid #00bcd4;
+      border: 2px solid #444;
+      transition: background-color 0.3s, border 0.3s;
     }
 
     .kdm.expiring {
-      border-left-color: red;
-      background-color: #2a1212;
+      background-color: #440000;
+      border: 2px solid #ff3c3c;
+    }
+
+    .kdm strong {
+      color: #ffd700;
     }
 
     .kdm-actions {
@@ -72,25 +86,31 @@
       gap: 10px;
     }
 
-    .error {
-      color: red;
-      margin-top: 15px;
-    }
-
     .kdm-actions button {
       flex: 1;
       font-size: 14px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
 
-<h1>نظام إدارة مفاتيح KDM</h1>
+<h1>🎬 إدارة مفاتيح KDM - السينما العراقية</h1>
 
 <form id="kdmForm">
-  <input type="text" id="movieName" placeholder="📽️ اسم الفيلم" required />
-  <input type="datetime-local" id="startTime" placeholder="⏱️ وقت البدء" required />
-  <input type="datetime-local" id="endTime" placeholder="🛑 وقت الانتهاء" required />
+  <label for="movieName">اسم الفيلم:</label>
+  <input type="text" id="movieName" placeholder="مثال: Avatar 2" required />
+
+  <label for="startTime">وقت بدء صلاحية المفتاح (KDM):</label>
+  <input type="datetime-local" id="startTime" required />
+
+  <label for="endTime">وقت انتهاء صلاحية المفتاح (KDM):</label>
+  <input type="datetime-local" id="endTime" required />
+
   <button type="submit">➕ إضافة المفتاح</button>
 </form>
 
@@ -157,9 +177,9 @@
 
       div.className = `kdm ${isExpiring ? 'expiring' : ''}`;
       div.innerHTML = `
-        <strong>🎬 ${kdm.movieName}</strong><br/>
-        ⏱️ من: ${new Date(kdm.startTime).toLocaleString()}<br/>
-        🛑 إلى: ${new Date(kdm.endTime).toLocaleString()}
+        <strong>🎞️ ${kdm.movieName}</strong><br/>
+        ⏳ من: ${new Date(kdm.startTime).toLocaleString()}<br/>
+        ⌛ إلى: ${new Date(kdm.endTime).toLocaleString()}
         <div class="kdm-actions">
           <button onclick="deleteKDM('${kdm._id}')">🗑️ حذف</button>
           <button onclick="editKDM('${kdm._id}', '${kdm.movieName}', '${kdm.startTime}', '${kdm.endTime}')">✏️ تعديل</button>
