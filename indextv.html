@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إدارة مفاتيح KDM - السينما الرقمية</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap');
+
+    body {
+      background: #1e1e2f;
+      color: #e2e2e2;
+      font-family: 'Cairo', sans-serif;
+      padding: 25px 15px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #ffd700;
+      font-weight: 900;
+      margin-bottom: 30px;
+    }
+
+    .desc-text {
+      font-size: 1rem;
+      color: #ccc;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    form {
+      background: #2c2c3f;
+      padding: 25px;
+      max-width: 500px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #444;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #3b3b4f;
+      color: #fff;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: linear-gradient(90deg, #d4af37, #a17f1c);
+      color: #000;
+      font-weight: bold;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #ffce54, #b5911c);
+    }
+
+    #searchInput {
+      display: block;
+      margin: 30px auto 40px;
+      padding: 12px 16px;
+      width: 90%;
+      max-width: 500px;
+      border: none;
+      border-radius: 10px;
+      background-color: #2b2b3d;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .search-label {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #ccc;
+    }
+
+    table {
+      width: 95%;
+      max-width: 1000px;
+      margin: auto;
+      border-spacing: 0 10px;
+    }
+
+    thead th {
+      background: #333850;
+      padding: 15px;
+      color: #f0f0f0;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .kdm-row {
+      background: #2d2d3c;
+      color: #fff;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .kdm-row td {
+      padding: 14px;
+      direction: ltr;
+      unicode-bidi: plaintext;
+    }
+
+    .ending-soon {
+      background: #a43535 !important;
+      color: #fff !important;
+    }
+
+    .action-btn {
+      margin: 0 5px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background: #d4af37;
+      color: #000;
+    }
+
+    .delete-btn {
+      background: #d1436f;
+      color: #fff;
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+<h1>إدارة مفاتيح KDM - السينما الرقمية</h1>
+
+<div class="search-label">🔍 ابحث عن مفاتيح KDM حسب اسم الفيلم مباشرة أثناء الكتابة</div>
+<input type="text" id="searchInput" placeholder="ابحث باسم الفيلم..." onkeyup="filterKDMs()" />
+
+<form id="kdmForm">
+  <label for="movieName">اسم الفيلم:</label>
+  <input type="text" id="movieName" placeholder="أدخل اسم الفيلم" required />
+
+  <div class="desc-text">اختر تاريخ ووقت بدء صلاحية المفتاح (KDM):</div>
+  <input type="datetime-local" id="startTime" required />
+
+  <div class="desc-text">اختر تاريخ ووقت نهاية صلاحية المفتاح (KDM):</div>
+  <input type="datetime-local" id="endTime" required />
+
+  <button type="submit">➕ إضافة المفتاح</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>اسم الفيلم</th>
+      <th>تاريخ البداية</th>
+      <th>تاريخ الانتهاء</th>
+      <th>الإجراءات</th>
+    </tr>
+  </thead>
+  <tbody id="kdmBody">
+    <!-- المحتوى يُحقن هنا -->
+  </tbody>
+</table>
+
+<script>
+  const apiUrl = 'https://kdm-iraqi-cinema.onrender.com/kdms';
+  const kdmForm = document.getElementById('kdmForm');
+  const kdmBody = document.getElementById('kdmBody');
+
+  async function loadKDMs() {
+    kdmBody.innerHTML = '';
+    try {
+      const res = await fetch(apiUrl);
+      const kdms = await res.json();
+
+      if (kdms.length === 0) {
+        kdmBody.innerHTML = `<tr><td colspan="4" class="empty-msg">لا توجد مفاتيح KDM مسجلة</td></tr>`;
+        return;
+      }
+
+      const now = new Date();
+      kdms.forEach(({ _id, movieName, startTime, endTime }) => {
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        const daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+        const isEndingSoon = daysLeft <= 5 && daysLeft >= 0;
+
+        const tr = document.createElement('tr');
+        tr.className = 'kdm-row' + (isEndingSoon ? ' ending-soon' : '');
+        tr.innerHTML = `
+          <td>${movieName}</td>
+          <td>${start.toLocaleString('en-US')}</td>
+          <td>${end.toLocaleString('en-US')}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editKDM('${_id}', \`${movieName}\`, '${startTime}', '${endTime}')">✏️</button>
+            <button class="action-btn delete-btn" onclick="deleteKDM('${_id}')">🗑️</button>
+          </td>
+        `;
+        kdmBody.appendChild(tr);
+      });
+    } catch (err) {
+      alert('فشل في تحميل البيانات');
+    }
+  }
+
+  kdmForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const movieName = document.getElementById('movieName').value.trim();
+    const startTime = document.getElementById('startTime').value;
+    const endTime = document.getElementById('endTime').value;
+
+    if (!movieName || !startTime || !endTime) {
+      alert('يرجى تعبئة جميع الحقول.');
+      return;
+    }
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ movieName, startTime, endTime })
+    });
+
+    if (res.ok) {
+      kdmForm.reset();
+      loadKDMs();
+    } else {
+      alert('حدث خطأ أثناء الإضافة');
+    }
+  });
+
+  async function deleteKDM(id) {
+    if (!confirm('هل تريد حذف المفتاح؟')) return;
+    const res = await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+    if (res.ok) loadKDMs();
+    else alert('خطأ أثناء الحذف');
+  }
+
+  function editKDM(id, movieName, startTime, endTime) {
+    document.getElementById('movieName').value = movieName;
+    document.getElementById('startTime').value = startTime;
+    document.getElementById('endTime').value = endTime;
+
+    const btn = kdmForm.querySelector('button');
+    btn.textContent = '💾 حفظ التعديل';
+
+    const newForm = kdmForm.cloneNode(true);
+    kdmForm.parentNode.replaceChild(newForm, kdmForm);
+
+    newForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const updatedName = document.getElementById('movieName').value.trim();
+      const updatedStart = document.getElementById('startTime').value;
+      const updatedEnd = document.getElementById('endTime').value;
+
+      const res = await fetch(`${apiUrl}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movieName: updatedName, startTime: updatedStart, endTime: updatedEnd })
+      });
+
+      if (res.ok) {
+        newForm.reset();
+        btn.textContent = '➕ إضافة المفتاح';
+        loadKDMs();
+      } else {
+        alert('فشل في التحديث');
+      }
+    });
+  }
+
+  function filterKDMs() {
+    const val = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#kdmBody .kdm-row');
+    rows.forEach(row => {
+      const movie = row.querySelector('td:first-child').textContent.toLowerCase();
+      row.style.display = movie.includes(val) ? '' : 'none';
+    });
+  }
+
+  loadKDMs();
+</script>
+</body>
+</html>
