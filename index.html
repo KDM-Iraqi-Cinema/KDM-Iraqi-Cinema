@@ -306,8 +306,8 @@
         <td>${start.toLocaleString('en-US', { hour12: false })}</td>
         <td>${end.toLocaleString('en-US', { hour12: false })}</td>
         <td>
-          <button class="action-btn edit-btn" onclick="editKDM('${_id}', '${escapeJS(movieName)}', '${startTime}', '${endTime}')">✏️ تعديل</button>
-          <button class="action-btn delete-btn" onclick="deleteKDM('${_id}')">🗑️ حذف</button>
+          <button class="action-btn edit-btn" onclick="editKDM('${_id}', '${escapeJS(movieName)}', '${startTime}', '${endTime}')">تعديل</button>
+          <button class="action-btn delete-btn" onclick="deleteKDM('${_id}')">حذف</button>
         </td>
       `;
       kdmBody.appendChild(row);
