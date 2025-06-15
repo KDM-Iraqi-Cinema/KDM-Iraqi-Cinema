@@ -2,50 +2,95 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>إدارة KDM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>نظام إدارة KDM</title>
   <style>
     body {
       background-color: #121212;
-      color: white;
-      font-family: 'Arial', sans-serif;
-      direction: rtl;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
       padding: 20px;
+      direction: rtl;
     }
+
+    h1 {
+      text-align: center;
+      color: #00bcd4;
+    }
+
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00000055;
+    }
+
     input, button {
+      width: 100%;
       padding: 10px;
-      margin: 5px 0;
+      margin: 10px 0;
       border: none;
       border-radius: 5px;
+      font-size: 16px;
     }
+
     input {
-      width: 100%;
-    }
-    button {
-      background-color: #1e88e5;
+      background-color: #2c2c2c;
       color: white;
-      cursor: pointer;
     }
+
+    button {
+      background-color: #00bcd4;
+      color: white;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0097a7;
+    }
+
     .kdm-entry {
       background-color: #1f1f1f;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
+      margin: 15px auto;
+      padding: 15px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 5px #00000055;
     }
+
     .kdm-entry.expiring {
       background-color: #b71c1c;
     }
-    .kdm-entry button {
-      margin-right: 10px;
+
+    .kdm-entry strong {
+      color: #ffc107;
+    }
+
+    .action-buttons {
+      margin-top: 10px;
+    }
+
+    .action-buttons button {
+      width: auto;
+      margin-left: 10px;
       background-color: #d32f2f;
     }
-    .edit-button {
+
+    .action-buttons .edit-button {
       background-color: #fbc02d;
+      color: black;
     }
   </style>
 </head>
 <body>
+
   <h1>نظام إدارة مفاتيح KDM</h1>
+
   <form id="kdmForm">
     <input type="text" id="movieName" placeholder="اسم الفيلم" required />
     <input type="datetime-local" id="startTime" required />
@@ -65,21 +110,23 @@
       kdmList.innerHTML = "";
       kdms.forEach((kdm, index) => {
         const end = new Date(kdm.endTime);
-        const today = new Date();
-        const diffDays = Math.floor((end - today) / (1000 * 60 * 60 * 24));
+        const now = new Date();
+        const diffDays = Math.floor((end - now) / (1000 * 60 * 60 * 24));
         const isExpiring = diffDays <= 5;
 
         const div = document.createElement("div");
         div.className = "kdm-entry";
         if (isExpiring) div.classList.add("expiring");
 
-        div.innerHTML = \`
-          <strong>\${kdm.movieName}</strong><br/>
-          من: \${kdm.startTime}<br/>
-          إلى: \${kdm.endTime}<br/>
-          <button onclick="editKDM(\${index})" class="edit-button">تعديل</button>
-          <button onclick="deleteKDM(\${index})">حذف</button>
-        \`;
+        div.innerHTML = `
+          <strong>الفيلم:</strong> ${kdm.movieName}<br/>
+          <strong>من:</strong> ${new Date(kdm.startTime).toLocaleString()}<br/>
+          <strong>إلى:</strong> ${new Date(kdm.endTime).toLocaleString()}<br/>
+          <div class="action-buttons">
+            <button class="edit-button" onclick="editKDM(${index})">تعديل</button>
+            <button onclick="deleteKDM(${index})">حذف</button>
+          </div>
+        `;
         kdmList.appendChild(div);
       });
     }
@@ -98,13 +145,16 @@
       document.getElementById("startTime").value = kdm.startTime;
       document.getElementById("endTime").value = kdm.endTime;
       editIndex = index;
+      window.scrollTo(0, 0);
     }
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      const movieName = document.getElementById("movieName").value;
+      const movieName = document.getElementById("movieName").value.trim();
       const startTime = document.getElementById("startTime").value;
       const endTime = document.getElementById("endTime").value;
+
+      if (!movieName || !startTime || !endTime) return;
 
       const kdms = JSON.parse(localStorage.getItem("kdms") || "[]");
 
@@ -122,5 +172,6 @@
 
     loadKDMs();
   </script>
+
 </body>
 </html>
